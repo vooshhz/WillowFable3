@@ -19,22 +19,27 @@ public class LoginManager : MonoBehaviour
 
     private void Start()
     {
+        Firebase.FirebaseApp.LogLevel = Firebase.LogLevel.Error;
+
         FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task =>
         {
             if (task.Result == DependencyStatus.Available)
             {
                 auth = FirebaseAuth.DefaultInstance;
                 messageText.text = "Firebase Initialized";
+                Debug.Log("Authentication connected to Firebase.");
             }
             else
             {
                 messageText.text = "Firebase failed to initialize: " + task.Result.ToString();
+                Debug.LogError("Firebase failed to initialize: " + task.Result.ToString());
             }
         });
 
         loginButton.onClick.AddListener(LoginUser);
         registerButton.onClick.AddListener(RegisterUser);
     }
+
 
     public void RegisterUser()
     {
