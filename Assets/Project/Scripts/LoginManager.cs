@@ -3,28 +3,29 @@ using UnityEngine.UI;
 using TMPro;
 using Firebase;
 using Firebase.Auth;
-using System.Threading.Tasks;
 using Firebase.Extensions;
 
 public class LoginManager : MonoBehaviour
 {
     public TMP_InputField emailInput;
     public TMP_InputField passwordInput;
-    public TMP_Text messageText;
     public Button loginButton;
-    public Button registerButton;
+    public TMP_Text messageText;
 
     private FirebaseAuth auth;
     private FirebaseUser user;
 
     private void Start()
     {
-        Firebase.FirebaseApp.LogLevel = Firebase.LogLevel.Error;
-
         FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task =>
         {
             if (task.Result == DependencyStatus.Available)
             {
+                FirebaseApp app = FirebaseApp.DefaultInstance;
+                Debug.Log("Firebase Project ID: " + app.Options.ProjectId);
+                Debug.Log("Firebase API Key: " + app.Options.ApiKey);
+                Debug.Log("Firebase App ID: " + app.Options.AppId);
+
                 auth = FirebaseAuth.DefaultInstance;
                 messageText.text = "Firebase Initialized";
                 Debug.Log("Authentication connected to Firebase.");
@@ -37,39 +38,6 @@ public class LoginManager : MonoBehaviour
         });
 
         loginButton.onClick.AddListener(LoginUser);
-        registerButton.onClick.AddListener(RegisterUser);
-    }
-
-
-    public void RegisterUser()
-    {
-        string email = emailInput.text;
-        string password = passwordInput.text;
-
-        if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
-        {
-            messageText.text = "Email and password cannot be empty.";
-            return;
-        }
-
-        auth.CreateUserWithEmailAndPasswordAsync(email, password).ContinueWithOnMainThread(task =>
-        {
-            if (task.IsCanceled)
-            {
-                messageText.text = "Registration canceled.";
-                return;
-            }
-            if (task.IsFaulted)
-            {
-                messageText.text = "Registration failed: " + task.Exception?.GetBaseException().Message;
-                return;
-            }
-
-            AuthResult result = task.Result;
-            user = result.User;
-
-            messageText.text = "Registration successful! Welcome, " + user.Email;
-        });
     }
 
     public void LoginUser()
@@ -88,19 +56,53 @@ public class LoginManager : MonoBehaviour
             if (task.IsCanceled)
             {
                 messageText.text = "Login canceled.";
+                Debug.LogError("Login canceled.");
                 return;
             }
+
             if (task.IsFaulted)
             {
-                messageText.text = "Login failed: " + task.Exception?.GetBaseException().Message;
+                FirebaseException firebaseEx = task.Exception?.Flatten().InnerExceptions[0] as FirebaseException;
+                AuthError errorCode = firebaseEx != null ? (AuthError)firebaseEx.ErrorCode : AuthError.None;
+
+                Debug.LogError($"Login Failed: {firebaseEx?.Message}");
+                Debug.LogError($"Firebase Error Code: {errorCode}");
+
+                switch (errorCode)
+                {
+                    case AuthError.MissingEmail:
+                        messageText.text = "Email is required.";
+                        break;
+                    case AuthError.MissingPassword:
+                        messageText.text = "Password is required.";
+                        break;
+                    case AuthError.InvalidEmail:
+                        messageText.text = "Invalid email format.";
+                        break;
+                    case AuthError.UserNotFound:
+                        messageText.text = "Account not found.";
+                        break;
+                    case AuthError.WrongPassword:
+                        messageText.text = "Incorrect password.";
+                        break;
+                    default:
+                        messageText.text = "Login failed: " + firebaseEx?.Message;
+                        break;
+                }
+
+                // Special Unity Editor workaround for internal error
+                if (Application.isEditor && firebaseEx != null && firebaseEx.Message.Contains("internal error"))
+                {
+                    messageText.text = "Account not found (Editor Workaround)";
+                }
+
                 return;
             }
 
-            AuthResult result = task.Result;
-            user = result.User;
-
+            // Success
+            user = task.Result.User;
             messageText.text = "Login successful! Welcome back, " + user.Email;
-            // Here you can load the next scene or enable the next part of your game
+            Debug.Log("Login successful: " + user.Email);
         });
     }
 }
