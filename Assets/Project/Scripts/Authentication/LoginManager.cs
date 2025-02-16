@@ -4,6 +4,8 @@ using TMPro;
 using Firebase;
 using Firebase.Auth;
 using Firebase.Extensions;
+using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class LoginManager : MonoBehaviour
 {
@@ -103,6 +105,15 @@ public class LoginManager : MonoBehaviour
             user = task.Result.User;
             messageText.text = "Login successful! Welcome back, " + user.Email;
             Debug.Log("Login successful: " + user.Email);
+
+            // Start coroutine to delay scene load by 1 second
+            StartCoroutine(LoadCharacterSelectionScene());
         });
+    }
+
+    private IEnumerator LoadCharacterSelectionScene()
+    {
+        yield return new WaitForSeconds(1f);
+        SceneManager.LoadScene("Scene_CharacterSelection");
     }
 }

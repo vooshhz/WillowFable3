@@ -6,7 +6,6 @@ public class EquipmentManagerEditor : Editor
 {
     public override void OnInspectorGUI()
     {
-        // Draw default inspector
         DrawDefaultInspector();
 
         EquipmentManager manager = (EquipmentManager)target;
@@ -19,7 +18,6 @@ public class EquipmentManagerEditor : Editor
                 itemNames[i] = manager.equipmentData.equipmentItems[i].itemName;
             }
 
-            // Dropdown to select an item
             int newIndex = EditorGUILayout.Popup("Select Item", manager.selectedIndex, itemNames);
 
             if (newIndex != manager.selectedIndex)
@@ -29,7 +27,7 @@ public class EquipmentManagerEditor : Editor
 
             if (GUILayout.Button("Update All Animations"))
             {
-                manager.RefreshAllAnimations(); // Trigger updates for all animation clips
+                manager.RefreshAllAnimations();
             }
         }
         else
