@@ -1,17 +1,26 @@
 using UnityEngine;
 using Firebase;
 using Firebase.Database;
+using Firebase.Auth;
 using Firebase.Extensions;
 using TMPro;
+using UnityEngine.UI;
 
 public class CharacterDisplayManager : MonoBehaviour
 {
     public GameObject characterPanelPrefab;
     public Transform panelParent;
 
+    public GameObject characterSelection1Prefab;
+    public GameObject characterSelection2Prefab;
+    public GameObject characterSelection3Prefab;
+
     public RenderTexture renderTexture1;
     public RenderTexture renderTexture2;
     public RenderTexture renderTexture3;
+
+    public float startingXPosition = -100f;
+    public float xOffset = 15f;
 
     private DatabaseReference dbReference;
 
@@ -25,7 +34,7 @@ public class CharacterDisplayManager : MonoBehaviour
             if (task.Result == DependencyStatus.Available)
             {
                 dbReference = FirebaseDatabase.DefaultInstance.RootReference;
-                string userId = Firebase.Auth.FirebaseAuth.DefaultInstance.CurrentUser.UserId;
+                string userId = FirebaseAuth.DefaultInstance.CurrentUser.UserId;
                 LoadCharacterData(userId);
             }
             else
@@ -52,7 +61,8 @@ public class CharacterDisplayManager : MonoBehaviour
                 return;
             }
 
-            int count = 0;
+            int characterIndex = 0;
+            float currentXPosition = startingXPosition;
 
             foreach (DataSnapshot characterSnapshot in snapshot.Children)
             {
@@ -60,19 +70,23 @@ public class CharacterDisplayManager : MonoBehaviour
                 string charClass = characterSnapshot.Child("characterClass").Value.ToString();
                 int level = int.Parse(characterSnapshot.Child("level").Value.ToString());
 
-                // Instantiate CharacterPanel1 in Canvas
-                GameObject panelInstance = Instantiate(characterPanelPrefab, panelParent);
+                int headItem = int.Parse(characterSnapshot.Child("headItemNumber").Value.ToString());
+                int bodyItem = int.Parse(characterSnapshot.Child("bodyItemNumber").Value.ToString());
+                int hairItem = int.Parse(characterSnapshot.Child("hairItemNumber").Value.ToString());
+                int torsoItem = int.Parse(characterSnapshot.Child("torsoItemNumber").Value.ToString());
+                int legsItem = int.Parse(characterSnapshot.Child("legsItemNumber").Value.ToString());
 
-                // Assign Text fields in CharacterPanel1
+                // === Instantiate Panel in Canvas ===
+                GameObject panelInstance = Instantiate(characterPanelPrefab, panelParent);
                 panelInstance.transform.Find("NameText").GetComponent<TMP_Text>().text = charName;
                 panelInstance.transform.Find("ClassText").GetComponent<TMP_Text>().text = charClass;
                 panelInstance.transform.Find("LevelText").GetComponent<TMP_Text>().text = "Level " + level;
 
-                // Assign the appropriate RenderTexture to RawImage
+                // === Assign the appropriate RenderTexture to Panel ===
                 CharacterPanelUI panelUI = panelInstance.GetComponent<CharacterPanelUI>();
                 if (panelUI != null && panelUI.rawImage != null)
                 {
-                    switch (count)
+                    switch (characterIndex)
                     {
                         case 0:
                             panelUI.rawImage.texture = renderTexture1;
@@ -90,8 +104,53 @@ public class CharacterDisplayManager : MonoBehaviour
                     Debug.LogWarning("CharacterPanelUI or RawImage is missing on panel instance.");
                 }
 
-                count++;
-                if (count >= 3) break;
+                // === Instantiate Preview Prefab ===
+                GameObject prefabToInstantiate = null;
+                switch (characterIndex)
+                {
+                    case 0:
+                        prefabToInstantiate = characterSelection1Prefab;
+                        break;
+                    case 1:
+                        prefabToInstantiate = characterSelection2Prefab;
+                        break;
+                    case 2:
+                        prefabToInstantiate = characterSelection3Prefab;
+                        break;
+                }
+
+                if (prefabToInstantiate != null)
+                {
+                    GameObject previewInstance = Instantiate(prefabToInstantiate, new Vector3(currentXPosition, 0f, 0f), Quaternion.identity);
+
+                    CharacterPreviewController previewController = previewInstance.GetComponent<CharacterPreviewController>();
+                    if (previewController != null)
+                    {
+                        CharacterEquipmentData equipmentData = new CharacterEquipmentData
+                        {
+                            headItemNumber = headItem,
+                            bodyItemNumber = bodyItem,
+                            hairItemNumber = hairItem,
+                            torsoItemNumber = torsoItem,
+                            legsItemNumber = legsItem
+                        };
+
+                        previewController.SetEquipmentData(equipmentData);
+                    }
+                    else
+                    {
+                        Debug.LogError("CharacterPreviewController component is missing on the instantiated preview prefab!");
+                    }
+                }
+
+                // Move X position for the next character
+                currentXPosition += xOffset;
+
+                characterIndex++;
+                if (characterIndex >= 3)
+                {
+                    break;
+                }
             }
         });
     }

@@ -305,6 +305,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5304092118210896348}
+  - component: {fileID: 5440177259862770082}
   m_Layer: 0
   m_Name: CharacterSelection3
   m_TagString: Untagged
@@ -329,6 +330,25 @@ Transform:
   - {fileID: 4693122703280713901}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5440177259862770082
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3275002601623247500}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b959bfedf029c246be464d403c8c8cc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  characterAnimator: {fileID: 6719592844114376878}
+  equipmentData:
+    headItemNumber: 0
+    bodyItemNumber: 0
+    hairItemNumber: 0
+    torsoItemNumber: 0
+    legsItemNumber: 0
 --- !u!1 &4826697096227352426
 GameObject:
   m_ObjectHideFlags: 0
