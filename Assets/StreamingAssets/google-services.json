@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "213082999936",
+    "firebase_url": "https://willowfable3-default-rtdb.firebaseio.com",
     "project_id": "willowfable3",
     "storage_bucket": "willowfable3.firebasestorage.app"
   },

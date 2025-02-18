@@ -24,7 +24,12 @@ public class LoginManager : MonoBehaviour
             if (task.Result == DependencyStatus.Available)
             {
                 FirebaseApp app = FirebaseApp.DefaultInstance;
+
+                // Set the Database URL here
+                app.Options.DatabaseUrl = new System.Uri("https://willowfable3-default-rtdb.firebaseio.com/");
+
                 Debug.Log("Firebase Project ID: " + app.Options.ProjectId);
+                Debug.Log("Firebase Database URL: " + app.Options.DatabaseUrl);
                 Debug.Log("Firebase API Key: " + app.Options.ApiKey);
                 Debug.Log("Firebase App ID: " + app.Options.AppId);
 
@@ -116,4 +121,6 @@ public class LoginManager : MonoBehaviour
         yield return new WaitForSeconds(1f);
         SceneManager.LoadScene("Scene_CharacterSelection");
     }
+
+
 }

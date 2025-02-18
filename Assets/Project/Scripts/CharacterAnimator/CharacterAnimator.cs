@@ -165,4 +165,9 @@ public class CharacterAnimator : MonoBehaviour
         Debug.LogWarning($"Item number {itemNumber} not found in {data.name}");
         return null;
     }
+
+    public void RefreshCurrentFrame()
+    {
+        SetFrame(currentFrame); // Keeps the same frame but applies new sprites
+    }
 }

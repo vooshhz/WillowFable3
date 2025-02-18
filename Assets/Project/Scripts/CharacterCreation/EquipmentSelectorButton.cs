@@ -56,7 +56,7 @@ public class EquipmentSelector : MonoBehaviour
                 break;
         }
 
-        characterAnimator.SetFrame(312); // Refresh display
+        characterAnimator.RefreshCurrentFrame(); ; // Refresh display
     }
 
     private int GetNextItemNumber(EquipmentData data, int currentItemNumber)
