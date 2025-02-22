@@ -110,6 +110,6 @@ public class CharacterSaveManager : MonoBehaviour
     private IEnumerator ReturnToCharacterSelectionScene()
     {
         yield return new WaitForSeconds(1f);
-        SceneManager.LoadScene("Scene_CharacterSelection2");
+        SceneManager.LoadScene("Scene_CharacterSelection");
     }
 }

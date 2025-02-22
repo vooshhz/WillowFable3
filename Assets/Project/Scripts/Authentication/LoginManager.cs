@@ -119,7 +119,7 @@ public class LoginManager : MonoBehaviour
     private IEnumerator LoadCharacterSelectionScene()
     {
         yield return new WaitForSeconds(1f);
-        SceneManager.LoadScene("Scene_CharacterSelection2");
+        SceneManager.LoadScene("Scene_CharacterSelection");
     }
 
 
