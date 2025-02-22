@@ -5,7 +5,7 @@ using Firebase;
 using Firebase.Auth;
 using Firebase.Extensions;
 
-public class RegisterUser : MonoBehaviour
+public class RegisterManager : MonoBehaviour
 {
     public TMP_InputField emailInputField;
     public TMP_InputField passwordInputField;
@@ -20,9 +20,7 @@ public class RegisterUser : MonoBehaviour
         {
             if (task.Result == DependencyStatus.Available)
             {
-                auth = FirebaseAuth.DefaultInstance;
-                messageText.text = "Firebase Initialized Successfully";
-                registerButton.onClick.AddListener(RegisterNewUser);
+                auth = FirebaseAuth.DefaultInstance;                
             }
             else
             {
@@ -31,10 +29,10 @@ public class RegisterUser : MonoBehaviour
         });
     }
 
-    private void RegisterNewUser()
+    public void RegisterNewUser()
     {
-        string email = emailInputField.text;
-        string password = passwordInputField.text;
+        string email = emailInputField.text.Trim();
+        string password = passwordInputField.text.Trim();
 
         if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
         {
@@ -42,42 +40,44 @@ public class RegisterUser : MonoBehaviour
             return;
         }
 
+        messageText.text = "Registering user...";
+
         auth.CreateUserWithEmailAndPasswordAsync(email, password).ContinueWithOnMainThread(task =>
         {
             if (task.IsCanceled)
             {
                 messageText.text = "Registration canceled.";
+                Debug.LogError("Registration canceled.");
                 return;
             }
+
             if (task.IsFaulted)
             {
+                messageText.text = "Registration failed.";
+                Debug.LogError("Registration failed.");
                 foreach (var exception in task.Exception.Flatten().InnerExceptions)
                 {
                     FirebaseException firebaseEx = exception as FirebaseException;
                     if (firebaseEx != null)
                     {
-                        switch ((AuthError)firebaseEx.ErrorCode)
-                        {
-                            case AuthError.EmailAlreadyInUse:
-                                messageText.text = "Email is already in use.";
-                                break;
-                            case AuthError.InvalidEmail:
-                                messageText.text = "Invalid email address.";
-                                break;
-                            case AuthError.WeakPassword:
-                                messageText.text = "Weak password, choose a stronger one.";
-                                break;
-                            default:
-                                messageText.text = "Registration failed: " + firebaseEx.Message;
-                                break;
-                        }
+                        AuthError errorCode = (AuthError)firebaseEx.ErrorCode;
+                        Debug.LogError($"Firebase Registration Error Code: {errorCode}");
+                        messageText.text = $"Registration failed: {errorCode.ToString()} - {firebaseEx.Message}";
+                    }
+                    else
+                    {
+                        messageText.text = "Registration failed: " + exception.Message;
                     }
                 }
                 return;
             }
 
             FirebaseUser newUser = task.Result.User;
-            messageText.text = "Registration successful! Welcome, " + newUser.Email;
+            messageText.text = "Registration successful! You can now log in.";
+            Debug.Log($"Registration successful! User: {newUser.Email}, UID: {newUser.UserId}");
+
+            // OPTIONAL: Sign out immediately to prevent auto-login effect
+            auth.SignOut(); // <-- THIS LINE LOGS THEM OUT RIGHT AFTER REGISTRATION
         });
     }
 }
