@@ -31,20 +31,23 @@ public class CharacterAnimator : MonoBehaviour
 
     private string currentAnimation;
 
-    // Animation Frames Dictionary (You already added this earlier)
+    // Animation Frames Dictionary
     private readonly Dictionary<string, (int startFrame, int endFrame)> animationFrames = new Dictionary<string, (int, int)>
-{
-    { "run_up", (442, 449) },
-    { "run_down", (468, 475) },
-    { "run_left", (455, 462) },
-    { "run_right", (481, 488) },
+    {
+        { "run_up", (442, 449) },
+        { "run_down", (468, 475) },
+        { "run_left", (455, 462) },
+        { "run_right", (481, 488) },
 
-    { "idle_up", (286, 287) },
-    { "idle_down", (312, 313) },
-    { "idle_left", (299, 300) },
-    { "idle_right", (325, 326) }
-};
+        { "idle_up", (286, 287) },
+        { "idle_down", (312, 313) },
+        { "idle_left", (299, 300) },
+        { "idle_right", (325, 326) }
+    };
 
+    private int currentAnimationStart;
+    private int currentAnimationEnd;
+    private bool loopAnimation;
 
     private void Start()
     {
@@ -53,25 +56,46 @@ public class CharacterAnimator : MonoBehaviour
 
     private void Update()
     {
-        UpdateAnimation(); // Handles frame timing and sprite updates
+        UpdateAnimation();
     }
 
-    // Plays an idle animation based on facing direction
+    /// <summary>
+    /// Applies character state from NetworkCharacter.
+    /// </summary>
+    public void ApplyCharacterState(CharacterState state, PlayerFacing direction)
+    {
+        if (state == CharacterState.Running)
+        {
+            PlayRun(direction);
+        }
+        else
+        {
+            PlayIdle(direction);
+        }
+    }
+
+    /// <summary>
+    /// Plays an idle animation based on facing direction.
+    /// </summary>
     public void PlayIdle(PlayerFacing facing)
     {
         PlayAnimation($"idle_{facing.ToString().ToLower()}", true);
     }
 
-    // Plays a walk animation based on facing direction
+    /// <summary>
+    /// Plays a run animation based on facing direction.
+    /// </summary>
     public void PlayRun(PlayerFacing facing)
     {
         PlayAnimation($"run_{facing.ToString().ToLower()}", true);
     }
 
-    // Core function to play an animation by name
+    /// <summary>
+    /// Core function to play an animation by name.
+    /// </summary>
     public void PlayAnimation(string animationName, bool looping)
     {
-        // Only restart if it's not the current animation
+        // Prevent restarting the same animation
         if (currentAnimation == animationName) return;
 
         currentAnimation = animationName;
@@ -91,12 +115,6 @@ public class CharacterAnimator : MonoBehaviour
         SetFrame(currentFrame); // Show the first frame immediately
     }
 
-
-
-    private int currentAnimationStart;
-    private int currentAnimationEnd;
-    private bool loopAnimation;
-
     private void UpdateAnimation()
     {
         frameTimer += Time.deltaTime;
@@ -104,21 +122,17 @@ public class CharacterAnimator : MonoBehaviour
         if (frameTimer >= frameRate)
         {
             frameTimer -= frameRate;
-
             currentFrame++;
-
 
             if (currentFrame > currentAnimationEnd)
             {
                 if (loopAnimation)
                 {
                     currentFrame = currentAnimationStart;
-
                 }
                 else
                 {
                     currentFrame = currentAnimationEnd;
-
                 }
             }
 
@@ -126,11 +140,12 @@ public class CharacterAnimator : MonoBehaviour
         }
     }
 
-
+    /// <summary>
+    /// Sets the correct frame for each body part.
+    /// </summary>
     public void SetFrame(int frameIndex)
     {
         currentFrame = frameIndex;
-       // Debug.Log($"Setting frame: {frameIndex}");
 
         if (headRenderer != null && headData != null)
             headRenderer.sprite = GetSpriteFromItem(headData, headItemNumber, frameIndex);
@@ -148,7 +163,9 @@ public class CharacterAnimator : MonoBehaviour
             legsRenderer.sprite = GetSpriteFromItem(legsData, legsItemNumber, frameIndex);
     }
 
-
+    /// <summary>
+    /// Fetches the correct sprite for an equipment item.
+    /// </summary>
     private Sprite GetSpriteFromItem(EquipmentData data, int itemNumber, int frameIndex)
     {
         foreach (var item in data.equipmentItems)
@@ -166,8 +183,11 @@ public class CharacterAnimator : MonoBehaviour
         return null;
     }
 
+    /// <summary>
+    /// Refreshes the character's current animation frame.
+    /// </summary>
     public void RefreshCurrentFrame()
     {
-        SetFrame(currentFrame); // Keeps the same frame but applies new sprites
+        SetFrame(currentFrame);
     }
 }

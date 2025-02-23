@@ -28,15 +28,38 @@ public class EnterGameManager : MonoBehaviour
 
     private void EnterGame()
     {
+        if (enterGameButton == null)
+        {
+            Debug.LogError("Enter Game Button is not assigned!");
+            return;
+        }
+
         if (!string.IsNullOrEmpty(selectedCharacterId))
         {
             PlayerPrefs.SetString("SelectedCharacterId", selectedCharacterId);
             PlayerPrefs.Save(); // Ensure data is saved
-            SceneManager.LoadScene("Scene_IntroScene"); // Replace with actual game scene
+
+            // Check if PersistentScene exists before trying to load it
+            Scene persistentScene = SceneManager.GetSceneByName("PersistentScene");
+            if (persistentScene == null)
+            {
+                Debug.LogError("PersistentScene is missing or not added in Build Settings.");
+                return;
+            }
+
+            if (!persistentScene.isLoaded)
+            {
+                SceneManager.LoadScene("PersistentScene", LoadSceneMode.Single);
+            }
+
+            // Load the actual game scene (Scene_IntroScene) additively
+            SceneManager.LoadScene("Scene_IntroScene", LoadSceneMode.Additive);
         }
         else
         {
             Debug.LogError("No character selected. Cannot enter the game.");
         }
     }
+
+
 }
