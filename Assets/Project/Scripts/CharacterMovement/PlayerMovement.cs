@@ -9,13 +9,15 @@ public class PlayerMovement : NetworkBehaviour
     private PlayerInput playerInput;
     private CharacterAnimator characterAnimator;
     private NetworkCharacter networkCharacter; // Reference to the network state handler
+    private Rigidbody2D rb;
 
     private PlayerFacing playerFacing = PlayerFacing.Down;
 
     private void Awake()
     {
         playerInput = GetComponent<PlayerInput>();
-        characterAnimator = GetComponentInChildren<CharacterAnimator>(); // Ensures it's found in child objects
+        rb = GetComponent<Rigidbody2D>(); // Assign Rigidbody2D component
+        characterAnimator = GetComponentInChildren<CharacterAnimator>(); // Ensure it's found in child objects
         networkCharacter = GetComponent<NetworkCharacter>(); // Ensure reference to network state
 
         if (characterAnimator == null)
@@ -28,7 +30,7 @@ public class PlayerMovement : NetworkBehaviour
         playerInput.actions["Move"].canceled += ctx => moveInput = Vector2.zero;
     }
 
-    private void Update()
+    private void FixedUpdate() // Use FixedUpdate for physics-based movement
     {
         if (!isLocalPlayer) return; // Prevent controlling other players
 
@@ -39,16 +41,31 @@ public class PlayerMovement : NetworkBehaviour
 
     private void MovePlayer()
     {
-        Vector3 moveVector = new Vector3(moveInput.x, moveInput.y, 0);
-        transform.position += moveVector * moveSpeed * Time.deltaTime;
+        Vector2 moveVector = moveInput * moveSpeed * Time.fixedDeltaTime;
+
+        // Apply movement using Rigidbody2D for proper collision handling
+        rb.MovePosition(rb.position + moveVector);
     }
 
     private void UpdatePlayerFacing()
     {
-        if (moveInput.y > 0) playerFacing = PlayerFacing.Up;
-        else if (moveInput.y < 0) playerFacing = PlayerFacing.Down;
-        else if (moveInput.x < 0) playerFacing = PlayerFacing.Left;
-        else if (moveInput.x > 0) playerFacing = PlayerFacing.Right;
+        if (moveInput == Vector2.zero) return; // No movement, keep current facing direction
+
+        float absX = Mathf.Abs(moveInput.x);
+        float absY = Mathf.Abs(moveInput.y);
+
+        if (absX > absY) // Prioritize Left/Right
+        {
+            playerFacing = (moveInput.x > 0) ? PlayerFacing.Right : PlayerFacing.Left;
+        }
+        else if (absY > absX) // Prioritize Up/Down
+        {
+            playerFacing = (moveInput.y > 0) ? PlayerFacing.Up : PlayerFacing.Down;
+        }
+        else // Handle exact diagonal case (tie)
+        {
+            playerFacing = (moveInput.x > 0) ? PlayerFacing.Right : PlayerFacing.Left;
+        }
     }
 
     private void UpdateAnimationState()
