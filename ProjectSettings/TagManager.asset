@@ -41,6 +41,6 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
-  - name: PlayerPreview
+  - name: Instances
     uniqueID: 3838831751
     locked: 0
