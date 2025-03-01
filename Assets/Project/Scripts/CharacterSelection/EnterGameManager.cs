@@ -1,10 +1,15 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using System.Collections;
+using UnityEditor;
 
 public class EnterGameManager : MonoBehaviour
 {
-    public Button enterGameButton; // Assign the Enter Game button in the Inspector
+    [SerializeField] private Button enterGameButton; // Assign the Enter Game button in the Inspector
+    [SerializeField] private string persistentScene;
+    [SerializeField] private string playerUIScene;
+    [SerializeField] private string introScene;
 
     private string selectedCharacterId = null;
 
@@ -39,21 +44,8 @@ public class EnterGameManager : MonoBehaviour
             PlayerPrefs.SetString("SelectedCharacterId", selectedCharacterId);
             PlayerPrefs.Save(); // Ensure data is saved
 
-            // Check if PersistentScene exists before trying to load it
-            Scene persistentScene = SceneManager.GetSceneByName("PersistentScene");
-            if (persistentScene == null)
-            {
-                Debug.LogError("PersistentScene is missing or not added in Build Settings.");
-                return;
-            }
-
-            if (!persistentScene.isLoaded)
-            {
-                SceneManager.LoadScene("PersistentScene", LoadSceneMode.Single);
-            }
-
-            // Load the actual game scene (Scene_IntroScene) additively
-            SceneManager.LoadScene("Scene_IntroScene", LoadSceneMode.Additive);
+            // Start loading scenes in sequence
+            StartCoroutine(LoadScenesSequentially());
         }
         else
         {
@@ -61,5 +53,31 @@ public class EnterGameManager : MonoBehaviour
         }
     }
 
+    private IEnumerator LoadScenesSequentially()
+    {
+        yield return LoadSceneIfNotLoaded(persistentScene);
+        yield return LoadSceneIfNotLoaded(playerUIScene);
+        yield return LoadSceneIfNotLoaded(introScene);
+    }
 
+    private IEnumerator LoadSceneIfNotLoaded(string scene)
+    {
+        string sceneName = GetSceneName(scene);
+        if (!SceneManager.GetSceneByName(sceneName).isLoaded)
+        {
+            SceneManager.LoadScene(sceneName, LoadSceneMode.Additive);
+            Debug.Log($"Loading {sceneName}...");
+
+            // Wait until the scene is fully loaded
+            while (!SceneManager.GetSceneByName(sceneName).isLoaded)
+            {
+                yield return null;
+            }
+        }
+    }
+
+    private string GetSceneName(string scene)
+    {
+        return scene != null ? scene : "";
+    }
 }

@@ -1,28 +1,44 @@
 using Mirror;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class CustomNetworkManager : NetworkManager
 {
+    [SerializeField] private string playerSpawnScene = "Scene_IntroScene"; // Editable in Inspector
+
     public override void OnServerAddPlayer(NetworkConnectionToClient conn)
     {
-        // Ensure Scene_IntroScene is loaded before spawning the player
-        Scene gameScene = SceneManager.GetSceneByName("Scene_IntroScene");
+        StartCoroutine(EnsureSceneLoaded(conn));
+    }
 
-        if (!gameScene.isLoaded)
+    private IEnumerator EnsureSceneLoaded(NetworkConnectionToClient conn)
+    {
+        string sceneName = playerSpawnScene; // Use the scene name from the Inspector
+
+        if (!SceneManager.GetSceneByName(sceneName).isLoaded)
         {
-            SceneManager.LoadScene("Scene_IntroScene", LoadSceneMode.Additive);
+            SceneManager.LoadScene(sceneName, LoadSceneMode.Additive);
+            Debug.Log($"Loading {sceneName}...");
+
+            while (!SceneManager.GetSceneByName(sceneName).isLoaded)
+            {
+                yield return null;
+            }
         }
 
-        // Spawn the player at a default spawn position (adjust as needed)
+        // Now that the scene is loaded, spawn the player
+        SpawnPlayer(conn);
+    }
+
+    private void SpawnPlayer(NetworkConnectionToClient conn)
+    {
         GameObject player = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
 
-        // Move the player to the correct game scene
-        SceneManager.MoveGameObjectToScene(player, gameScene);
+        // Move player to the configured scene
+        SceneManager.MoveGameObjectToScene(player, SceneManager.GetSceneByName(playerSpawnScene));
 
-        // Add the player to the network
         NetworkServer.AddPlayerForConnection(conn, player);
-
-        Debug.Log($"Spawned player in scene: {gameScene.name}");
+        Debug.Log($"Spawned player in scene: {playerSpawnScene}");
     }
 }

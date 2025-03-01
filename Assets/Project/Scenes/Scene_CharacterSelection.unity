@@ -1964,6 +1964,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enterGameButton: {fileID: 414964535}
+  persistentScene: PersistentScene
+  playerUIScene: PlayerUIScene
+  introScene: Scene_Login
 --- !u!4 &1229728055
 Transform:
   m_ObjectHideFlags: 0

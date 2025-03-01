@@ -4,6 +4,7 @@ using TMPro;
 using Firebase;
 using Firebase.Auth;
 using Firebase.Extensions;
+using System;
 
 public class RegisterManager : MonoBehaviour
 {
@@ -14,22 +15,36 @@ public class RegisterManager : MonoBehaviour
 
     private FirebaseAuth auth;
 
-    private void Start()
+    private async void Start()
     {
-        FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task =>
+        try
         {
-            if (task.Result == DependencyStatus.Available)
+            Debug.Log("Checking Firebase dependencies...");
+            var dependencyStatus = await FirebaseApp.CheckAndFixDependenciesAsync();
+
+            if (dependencyStatus == DependencyStatus.Available)
             {
-                auth = FirebaseAuth.DefaultInstance;                
+                Debug.Log("Firebase dependencies are available.");
+                FirebaseApp app = FirebaseApp.DefaultInstance;
+                auth = FirebaseAuth.DefaultInstance;
+                Debug.Log("Firebase Authentication initialized.");
+                messageText.text = "Firebase initialized successfully!";
             }
             else
             {
-                messageText.text = "Firebase initialization failed: " + task.Result.ToString();
+                Debug.LogError($"Firebase dependencies error: {dependencyStatus}");
+                messageText.text = "Firebase initialization failed: " + dependencyStatus.ToString();
             }
-        });
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Error initializing Firebase: {e.Message}");
+            messageText.text = "Firebase error: " + e.Message;
+        }
     }
 
-    public void RegisterNewUser()
+
+public void RegisterNewUser()
     {
         string email = emailInputField.text.Trim();
         string password = passwordInputField.text.Trim();
