@@ -1,5 +1,7 @@
 public enum CharacterState
 {
     Idle,
-    Running
+    Running,
+    Attacking,
+    Casting
 }

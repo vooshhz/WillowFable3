@@ -14,6 +14,8 @@ public class NetworkCharacter : NetworkBehaviour
     [SyncVar(hook = nameof(OnEquipmentChanged))] public int hairItem;
     [SyncVar(hook = nameof(OnEquipmentChanged))] public int torsoItem;
     [SyncVar(hook = nameof(OnEquipmentChanged))] public int legsItem;
+    [SyncVar(hook = nameof(OnEquipmentChanged))] public int weaponForegroundItem;
+    [SyncVar(hook = nameof(OnEquipmentChanged))] public int weaponBackgroundItem;
 
     [SyncVar(hook = nameof(OnStateChanged))]
     public CharacterState currentState = CharacterState.Idle;
@@ -121,6 +123,10 @@ public class NetworkCharacter : NetworkBehaviour
                 int newTorso = int.Parse(snapshot.Child("torsoItemNumber").Value.ToString());
                 int newLegs = int.Parse(snapshot.Child("legsItemNumber").Value.ToString());
 
+                // Set default weapons 
+                weaponForegroundItem = 60001; // Default spear
+                weaponBackgroundItem = 600011;
+
                 // Set SyncVars on the server so they sync to all clients
                 headItem = newHead;
                 bodyItem = newBody;
@@ -176,6 +182,8 @@ public class NetworkCharacter : NetworkBehaviour
         characterAnimator.hairItemNumber = hairItem;
         characterAnimator.torsoItemNumber = torsoItem;
         characterAnimator.legsItemNumber = legsItem;
+        characterAnimator.weaponForegroundItemNumber = weaponForegroundItem;
+    characterAnimator.weaponBackgroundItemNumber = weaponBackgroundItem;
 
         characterAnimator.RefreshCurrentFrame();
     }
@@ -209,21 +217,28 @@ public class NetworkCharacter : NetworkBehaviour
         ApplyCharacterState(currentState, newDirection);
     }
 
-    private void ApplyCharacterState(CharacterState state, PlayerFacing direction)
+    public void ApplyCharacterState(CharacterState state, PlayerFacing direction)
+{
+    if (characterAnimator == null)
     {
-        if (characterAnimator == null)
-        {
-            Debug.LogError("CharacterAnimator component missing!");
-            return;
-        }
-
-        if (state == CharacterState.Running)
-        {
-            characterAnimator.PlayRun(direction);
-        }
-        else
-        {
-            characterAnimator.PlayIdle(direction);
-        }
+        Debug.LogError("CharacterAnimator component missing!");
+        return;
     }
+
+    switch (state)
+    {
+        case CharacterState.Idle:
+            characterAnimator.PlayIdle(direction);
+            break;
+        case CharacterState.Running:
+            characterAnimator.PlayRun(direction);
+            break;
+        case CharacterState.Attacking:
+            characterAnimator.PlayAnimation($"thrust_{direction.ToString().ToLower()}", false);
+            break;
+        case CharacterState.Casting:
+            characterAnimator.PlayAnimation($"spellcast_{direction.ToString().ToLower()}", false);
+            break;
+    }
+}
 }

@@ -9,6 +9,8 @@ public class CharacterAnimator : MonoBehaviour
     public SpriteRenderer hairRenderer;
     public SpriteRenderer torsoRenderer;
     public SpriteRenderer legsRenderer;
+    public SpriteRenderer weaponForegroundRenderer;
+    public SpriteRenderer weaponBackgroundRenderer;
 
     // Data sources
     public EquipmentData headData;
@@ -16,6 +18,8 @@ public class CharacterAnimator : MonoBehaviour
     public EquipmentData hairData;
     public EquipmentData torsoData;
     public EquipmentData legsData;
+    public EquipmentData weaponForegroundData;
+    public EquipmentData weaponBackgroundData;  
 
     // Equipped items
     public int headItemNumber = 20001;
@@ -23,6 +27,8 @@ public class CharacterAnimator : MonoBehaviour
     public int hairItemNumber = 30001;
     public int torsoItemNumber = 40001;
     public int legsItemNumber = 50001;
+    public int weaponForegroundItemNumber = 60001;
+    public int weaponBackgroundItemNumber = 600011;
 
     // Current animation state
     private int currentFrame;
@@ -34,15 +40,64 @@ public class CharacterAnimator : MonoBehaviour
     // Animation Frames Dictionary
     private readonly Dictionary<string, (int startFrame, int endFrame)> animationFrames = new Dictionary<string, (int, int)>
     {
-        { "run_up", (442, 449) },
-        { "run_down", (468, 475) },
-        { "run_left", (455, 462) },
-        { "run_right", (481, 488) },
-
+        { "spellcast_up", (0, 6) },
+        { "spellcast_left", (13, 19) },
+        { "spellcast_down", (26, 32) },
+        { "spellcast_right", (39, 45) },
+        { "thrust_up", (52, 59) },
+        { "thrust_left", (65, 72) },
+        { "thrust_down", (78, 85) },
+        { "thrust_right", (91, 98) },
+        { "walk_up", (104, 112) },
+        { "walk_left", (117, 125) },
+        { "walk_down", (130, 138) },
+        { "walk_right", (143, 151) },
+        { "slash_up", (156, 161) },
+        { "slash_left", (169, 174) },
+        { "slash_down", (182, 187) },
+        { "slash_right", (195, 200) },
+        { "shoot_up", (208, 220) },
+        { "shoot_left", (221, 233) },
+        { "shoot_down", (234, 246) },
+        { "shoot_right", (247, 259) },
+        { "hurt", (260, 265) },
+        { "climb", (273, 278) },
         { "idle_up", (286, 287) },
-        { "idle_down", (312, 313) },
         { "idle_left", (299, 300) },
-        { "idle_right", (325, 326) }
+        { "idle_down", (312, 313) },
+        { "idle_right", (325, 326) },
+        { "combat_up", (288, 289) },
+        { "combat_left", (301, 302) },
+        { "combat_down", (314, 315) },
+        { "combat_right", (327, 328) },
+        { "jump_up", (338, 342) },
+        { "jump_left", (351, 355) },
+        { "jump_down", (364, 368) },
+        { "jump_right", (377, 381) },
+        { "sit_up", (390, 392) },
+        { "sit_left", (403, 405) },
+        { "sit_down", (416, 418) },
+        { "sit_right", (429, 431) },
+        { "emote_up", (393, 395) },
+        { "emote_left", (406, 408) },
+        { "emote_down", (419, 421) },
+        { "emote_right", (432, 434) },
+        { "run_up", (442, 449) },
+        { "run_left", (455, 462) },
+        { "run_down", (468, 475) },
+        { "run_right", (481, 488) },
+        { "one_hand_halfslash_up", (500, 502) },
+        { "one_hand_halfslash_left", (513, 515) },
+        { "one_hand_halfslash_down", (526, 528) },
+        { "one_hand_halfslash_right", (539, 541) },
+        { "one_hand_backslash_up", (494, 506) },
+        { "one_hand_backslash_left", (507, 519) },
+        { "one_hand_backslash_down", (520, 532) },
+        { "one_hand_backslash_right", (533, 545) },
+        { "one_hand_slash_up", (546, 551) },
+        { "one_hand_slash_left", (559, 564) },
+        { "one_hand_slash_down", (572, 577) },
+        { "one_hand_slash_right", (585, 590) }
     };
 
     private int currentAnimationStart;
@@ -161,6 +216,12 @@ public class CharacterAnimator : MonoBehaviour
 
         if (legsRenderer != null && legsData != null)
             legsRenderer.sprite = GetSpriteFromItem(legsData, legsItemNumber, frameIndex);
+
+        if (weaponForegroundRenderer != null && weaponForegroundData != null)
+            weaponForegroundRenderer.sprite = GetSpriteFromItem(weaponForegroundData, weaponForegroundItemNumber, frameIndex);
+        
+        if (weaponBackgroundRenderer != null && weaponBackgroundData != null)
+            weaponBackgroundRenderer.sprite = GetSpriteFromItem(weaponBackgroundData, weaponBackgroundItemNumber, frameIndex);
     }
 
     /// <summary>

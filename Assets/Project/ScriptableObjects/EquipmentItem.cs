@@ -12,7 +12,8 @@ public class EquipmentData : ScriptableObject
             torso,
             pants,
             head,
-            hair
+            hair,
+            weapon
         }
 
         public ItemType itemType;           // The type of the item (body, torso, pants)

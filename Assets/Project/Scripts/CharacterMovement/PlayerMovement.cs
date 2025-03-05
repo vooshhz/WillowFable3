@@ -30,15 +30,26 @@ public class PlayerMovement : NetworkBehaviour
         playerInput.actions["Move"].canceled += ctx => moveInput = Vector2.zero;
     }
 
-    private void FixedUpdate() // Use FixedUpdate for physics-based movement
+   private void FixedUpdate()
+{
+    if (!isLocalPlayer) return;
+    
+    PlayerCombat combat = GetComponent<PlayerCombat>();
+    
+    // Only move if not attacking/casting
+    if (combat == null || !combat.IsPerformingAction())
     {
-        if (!isLocalPlayer) return; // Prevent controlling other players
-
         MovePlayer();
         UpdatePlayerFacing();
+        UpdateAnimationState(); 
+    }
+    
+    // Only update animation from movement script if combat isn't handling it
+    if (combat == null)
+    {
         UpdateAnimationState();
     }
-
+}
     private void MovePlayer()
     {
         Vector2 moveVector = moveInput * moveSpeed * Time.fixedDeltaTime;
@@ -80,4 +91,17 @@ public class PlayerMovement : NetworkBehaviour
             networkCharacter.CmdUpdateState(newState, playerFacing);
         }
     }
+    // Add these methods to PlayerMovement
+public PlayerFacing GetCurrentFacing()
+{
+    return playerFacing;
+}
+
+public bool IsMoving()
+{
+    return moveInput != Vector2.zero;
+}
+
+// Update FixedUpdate to check with PlayerCombat
+
 }

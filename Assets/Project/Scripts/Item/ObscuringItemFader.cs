@@ -15,15 +15,12 @@ public class ObscuringItemFader : MonoBehaviour
 
     public void FadeOut()
     {
-        if (!NetworkClient.active) return; // Ensure this only runs on the client
-
         if (fadeCoroutine != null) StopCoroutine(fadeCoroutine);
         fadeCoroutine = StartCoroutine(FadeRoutine(Settings.targetAlpha, Settings.fadeOutSeconds));
     }
 
     public void FadeIn()
     {
-        if (!NetworkClient.active) return; // Ensure this only runs on the client
 
         if (fadeCoroutine != null) StopCoroutine(fadeCoroutine);
         fadeCoroutine = StartCoroutine(FadeRoutine(1f, Settings.fadeInSeconds));
