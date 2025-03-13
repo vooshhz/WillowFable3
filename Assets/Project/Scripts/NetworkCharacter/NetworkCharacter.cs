@@ -182,8 +182,7 @@ public class NetworkCharacter : NetworkBehaviour
         characterAnimator.hairItemNumber = hairItem;
         characterAnimator.torsoItemNumber = torsoItem;
         characterAnimator.legsItemNumber = legsItem;
-        characterAnimator.weaponForegroundItemNumber = weaponForegroundItem;
-    characterAnimator.weaponBackgroundItemNumber = weaponBackgroundItem;
+
 
         characterAnimator.RefreshCurrentFrame();
     }
@@ -232,12 +231,6 @@ public class NetworkCharacter : NetworkBehaviour
             break;
         case CharacterState.Running:
             characterAnimator.PlayRun(direction);
-            break;
-        case CharacterState.Attacking:
-            characterAnimator.PlayAnimation($"thrust_{direction.ToString().ToLower()}", false);
-            break;
-        case CharacterState.Casting:
-            characterAnimator.PlayAnimation($"spellcast_{direction.ToString().ToLower()}", false);
             break;
     }
 }

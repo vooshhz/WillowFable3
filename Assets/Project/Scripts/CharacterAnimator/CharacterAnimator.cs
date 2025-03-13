@@ -9,8 +9,7 @@ public class CharacterAnimator : MonoBehaviour
     public SpriteRenderer hairRenderer;
     public SpriteRenderer torsoRenderer;
     public SpriteRenderer legsRenderer;
-    public SpriteRenderer weaponForegroundRenderer;
-    public SpriteRenderer weaponBackgroundRenderer;
+
 
     // Data sources
     public EquipmentData headData;
@@ -18,8 +17,6 @@ public class CharacterAnimator : MonoBehaviour
     public EquipmentData hairData;
     public EquipmentData torsoData;
     public EquipmentData legsData;
-    public EquipmentData weaponForegroundData;
-    public EquipmentData weaponBackgroundData;  
 
     // Equipped items
     public int headItemNumber = 20001;
@@ -27,8 +24,7 @@ public class CharacterAnimator : MonoBehaviour
     public int hairItemNumber = 30001;
     public int torsoItemNumber = 40001;
     public int legsItemNumber = 50001;
-    public int weaponForegroundItemNumber = 60001;
-    public int weaponBackgroundItemNumber = 600011;
+
 
     // Current animation state
     private int currentFrame;
@@ -216,12 +212,6 @@ public class CharacterAnimator : MonoBehaviour
 
         if (legsRenderer != null && legsData != null)
             legsRenderer.sprite = GetSpriteFromItem(legsData, legsItemNumber, frameIndex);
-
-        if (weaponForegroundRenderer != null && weaponForegroundData != null)
-            weaponForegroundRenderer.sprite = GetSpriteFromItem(weaponForegroundData, weaponForegroundItemNumber, frameIndex);
-        
-        if (weaponBackgroundRenderer != null && weaponBackgroundData != null)
-            weaponBackgroundRenderer.sprite = GetSpriteFromItem(weaponBackgroundData, weaponBackgroundItemNumber, frameIndex);
     }
 
     /// <summary>

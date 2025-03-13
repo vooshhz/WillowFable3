@@ -56,5 +56,6 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "WillowFable3.sln"
+    "dotnet.defaultSolution": "WillowFable3.sln",
+    "dotnet.preferCSharpExtension": true
 }

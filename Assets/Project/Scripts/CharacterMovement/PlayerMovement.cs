@@ -33,22 +33,10 @@ public class PlayerMovement : NetworkBehaviour
    private void FixedUpdate()
 {
     if (!isLocalPlayer) return;
-    
-    PlayerCombat combat = GetComponent<PlayerCombat>();
-    
-    // Only move if not attacking/casting
-    if (combat == null || !combat.IsPerformingAction())
-    {
         MovePlayer();
         UpdatePlayerFacing();
         UpdateAnimationState(); 
-    }
-    
-    // Only update animation from movement script if combat isn't handling it
-    if (combat == null)
-    {
         UpdateAnimationState();
-    }
 }
     private void MovePlayer()
     {
