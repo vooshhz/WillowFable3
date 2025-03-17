@@ -21,58 +21,76 @@ public class CharacterSaveManager : MonoBehaviour
         dbReference = FirebaseDatabase.GetInstance("https://willowfable3-default-rtdb.firebaseio.com/").RootReference;
     }
 
-    public void SaveCharacterData()
+public void SaveCharacterData()
+{
+    FirebaseUser user = FirebaseAuth.DefaultInstance.CurrentUser;
+
+    if (user == null)
     {
-        FirebaseUser user = FirebaseAuth.DefaultInstance.CurrentUser;
+        Debug.LogError("User is not logged in.");
+        return;
+    }
 
-        if (user == null)
+    string userId = user.UserId;
+    string characterName = characterNameInput.text;
+
+    // Check if a character with the same name already exists
+    dbReference.Child("users").Child(userId).Child("characters")
+        .GetValueAsync().ContinueWithOnMainThread(task =>
         {
-            Debug.LogError("User is not logged in.");
-            return;
-        }
-
-        string userId = user.UserId;
-        string characterName = characterNameInput.text;
-
-        // Check if a character with the same name already exists
-        dbReference.Child("users").Child(userId).Child("characters")
-            .GetValueAsync().ContinueWithOnMainThread(task =>
+            if (task.IsFaulted)
             {
-                if (task.IsFaulted)
-                {
-                    Debug.LogError("Failed to check existing characters: " + task.Exception);
-                    return;
-                }
+                Debug.LogError("Failed to check existing characters: " + task.Exception);
+                return;
+            }
 
-                if (task.IsCompleted)
-                {
-                    DataSnapshot snapshot = task.Result;
-                    bool nameExists = false;
+            if (task.IsCompleted)
+            {
+                DataSnapshot snapshot = task.Result;
+                
+                // Count characters
+                int characterCount = 0;
+                bool nameExists = false;
 
-                    foreach (DataSnapshot characterSnapshot in snapshot.Children)
+                foreach (DataSnapshot characterSnapshot in snapshot.Children)
+                {
+                    // Check if this is a valid character node
+                    if (characterSnapshot.HasChild("info") && 
+                        characterSnapshot.HasChild("equipment") && 
+                        characterSnapshot.HasChild("inventory"))
                     {
-                        string existingName = characterSnapshot.Child("characterName").Value.ToString();
+                        characterCount++;
+
+                        // Check for existing name in the info node
+                        string existingName = characterSnapshot.Child("info").Child("characterName").Value?.ToString();
 
                         if (existingName == characterName)
                         {
                             nameExists = true;
-                            break;
                         }
                     }
-
-                    if (nameExists)
-                    {
-                        Debug.LogWarning("Character name already exists. Choose a different name.");
-                        errorMessageText.text = "Character name already exists. Choose another name.";
-                    }
-                    else
-                    {
-                        CreateNewCharacter(userId, characterName);
-                    }
                 }
-            });
-    }
 
+                // Check character limit
+                if (characterCount >= 3)
+                {
+                    Debug.LogWarning("Maximum character limit reached.");
+                    errorMessageText.text = "Maximum of 3 characters allowed.";
+                    return;
+                }
+
+                if (nameExists)
+                {
+                    Debug.LogWarning("Character name already exists. Choose a different name.");
+                    errorMessageText.text = "Character name already exists. Choose another name.";
+                }
+                else
+                {
+                    CreateNewCharacter(userId, characterName);
+                }
+            }
+        });
+    }
     private void CreateNewCharacter(string userId, string characterName)
     {
         // Create character key first

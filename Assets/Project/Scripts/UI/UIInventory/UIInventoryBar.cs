@@ -23,7 +23,7 @@ public class UIInventoryBar : MonoBehaviour
         SwitchInventoryBarPosition();   
     }
 
-    private void InventoryUpdated(InventoryLocation inventoryLocation, List<InventoryItem> inventoryList)
+    public void InventoryUpdated(InventoryLocation inventoryLocation, List<InventoryItem> inventoryList)
     {
         if (inventoryLocation == InventoryLocation.player)
         {
@@ -97,4 +97,5 @@ public class UIInventoryBar : MonoBehaviour
 
         }
     }
+   
 }

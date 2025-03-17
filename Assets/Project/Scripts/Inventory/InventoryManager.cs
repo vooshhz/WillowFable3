@@ -1,9 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class InventoryManager : MonoBehaviour // Need to check this part and figure out singleton without inherting
 {
+    public UIInventoryBar inventoryBar;
     public static InventoryManager Instance { get; private set; }
     private Dictionary<int, ItemDetails> itemDetailsDictionary;
 
@@ -29,7 +31,6 @@ public class InventoryManager : MonoBehaviour // Need to check this part and fig
         // Create inventory lists
         CreateInventoryLists();
     }
-
     private void CreateInventoryLists()
     {
         inventoryLists = new List<InventoryItem>[(int)InventoryLocation.count];
@@ -67,7 +68,9 @@ public class InventoryManager : MonoBehaviour // Need to check this part and fig
         else
         {
             AddItemAtPosition(inventoryList, itemCode);
-        }    
+        }
+            
+        inventoryBar.InventoryUpdated(inventoryLocation, inventoryList);
     }
 
     public int FindItemInInventory(InventoryLocation inventoryLocation, int itemCode)
@@ -140,13 +143,37 @@ public class InventoryManager : MonoBehaviour // Need to check this part and fig
 
     }
 
-    private void DebugPrintInventoryList(List<InventoryItem> inventoryList)
-    {
-        foreach(InventoryItem inventoryItem in inventoryList)
-        {
-            Debug.Log("Item Description:" + InventoryManager.Instance.GetItemDetails(inventoryItem.itemCode).itemDescription + "    Item Quantity: " + inventoryItem.itemQuantity);
-        }
+    public void InitializeInventoryBar()
+{
+    // Find the InitializeUI script in the scene
+    InitializeUI initializeUI = FindObjectOfType<InitializeUI>();
 
-        Debug.Log("******************************************");
+    if (initializeUI == null)
+    {
+        Debug.LogError("InitializeUI not found in the scene.");
+        return;
+    }
+
+    // Get inventoryBar from InitializeUI
+    GameObject inventoryBarObject = initializeUI.inventoryBar;
+
+    if (inventoryBarObject != null)
+    {
+        inventoryBar = inventoryBarObject.GetComponent<UIInventoryBar>();
+
+        if (inventoryBar != null)
+        {
+            Debug.Log("Inventory bar initialized successfully.");
+        }
+        else
+        {
+            Debug.LogError("UIInventoryBar component not found on the GameObject.");
+        }
+    }
+    else
+    {
+        Debug.LogError("Inventory bar GameObject not assigned in InitializeUI.");
     }
 }
+
+  }
