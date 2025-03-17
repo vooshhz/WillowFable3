@@ -6,6 +6,7 @@ using Firebase.Extensions;
 using UnityEngine.SceneManagement;
 using Cinemachine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class NetworkCharacter : NetworkBehaviour
 {
@@ -104,40 +105,41 @@ public class NetworkCharacter : NetworkBehaviour
         LoadCharacterDataFromFirebaseServer();
     }
 
-    [Server]
-    private void LoadCharacterDataFromFirebaseServer()
-    {
-        dbRef.Child("users").Child(userId).Child("characters").Child(characterId).GetValueAsync()
-            .ContinueWithOnMainThread(task =>
+[Server]
+private void LoadCharacterDataFromFirebaseServer()
+{
+    dbRef.Child("users").Child(userId).Child("characters").Child(characterId).GetValueAsync()
+        .ContinueWithOnMainThread(task =>
+        {
+            if (task.IsFaulted || !task.Result.Exists)
             {
-                if (task.IsFaulted || !task.Result.Exists)
-                {
-                    Debug.LogError("Error retrieving character data from Firebase.");
-                    return;
-                }
+                Debug.LogError("Error retrieving character data from Firebase.");
+                return;
+            }
 
-                DataSnapshot snapshot = task.Result;
-                int newHead = int.Parse(snapshot.Child("headItemNumber").Value.ToString());
-                int newBody = int.Parse(snapshot.Child("bodyItemNumber").Value.ToString());
-                int newHair = int.Parse(snapshot.Child("hairItemNumber").Value.ToString());
-                int newTorso = int.Parse(snapshot.Child("torsoItemNumber").Value.ToString());
-                int newLegs = int.Parse(snapshot.Child("legsItemNumber").Value.ToString());
+            DataSnapshot snapshot = task.Result;
+            
+            // Read equipment data from new path
+            DataSnapshot equipmentData = snapshot.Child("equipment");
+            
+            // Read equipment values
+            int newHead = int.Parse(equipmentData.Child("head").Value.ToString());
+            int newBody = int.Parse(equipmentData.Child("body").Value.ToString());
+            int newHair = int.Parse(equipmentData.Child("hair").Value.ToString());
+            int newTorso = int.Parse(equipmentData.Child("torso").Value.ToString());
+            int newLegs = int.Parse(equipmentData.Child("legs").Value.ToString());
 
-                // Set default weapons 
-                weaponForegroundItem = 60001; // Default spear
-                weaponBackgroundItem = 600011;
 
-                // Set SyncVars on the server so they sync to all clients
-                headItem = newHead;
-                bodyItem = newBody;
-                hairItem = newHair;
-                torsoItem = newTorso;
-                legsItem = newLegs;
+            // Set SyncVars on the server so they sync to all clients
+            headItem = newHead;
+            bodyItem = newBody;
+            hairItem = newHair;
+            torsoItem = newTorso;
+            legsItem = newLegs;
 
-                Debug.Log($"Server updated SyncVars: Head:{headItem}, Body:{bodyItem}, Hair:{hairItem}, Torso:{torsoItem}, Legs:{legsItem}");
-            });
-    }
-
+            Debug.Log($"Server updated SyncVars: Head:{headItem}, Body:{bodyItem}, Hair:{hairItem}, Torso:{torsoItem}, Legs:{legsItem}");
+        });
+}
     [Command]
     public void CmdChangeEquipment(int newHead, int newBody, int newHair, int newTorso, int newLegs)
     {
@@ -157,11 +159,17 @@ public class NetworkCharacter : NetworkBehaviour
     [Server]
     private void SaveEquipmentToFirebase(int newHead, int newBody, int newHair, int newTorso, int newLegs)
     {
-        dbRef.Child("users").Child(userId).Child("characters").Child(characterId).Child("headItemNumber").SetValueAsync(newHead);
-        dbRef.Child("users").Child(userId).Child("characters").Child(characterId).Child("bodyItemNumber").SetValueAsync(newBody);
-        dbRef.Child("users").Child(userId).Child("characters").Child(characterId).Child("hairItemNumber").SetValueAsync(newHair);
-        dbRef.Child("users").Child(userId).Child("characters").Child(characterId).Child("torsoItemNumber").SetValueAsync(newTorso);
-        dbRef.Child("users").Child(userId).Child("characters").Child(characterId).Child("legsItemNumber").SetValueAsync(newLegs);
+        Dictionary<string, object> updates = new Dictionary<string, object>();
+        
+        // Update equipment values using the new path
+        updates[$"users/{userId}/characters/{characterId}/equipment/head"] = newHead;
+        updates[$"users/{userId}/characters/{characterId}/equipment/body"] = newBody;
+        updates[$"users/{userId}/characters/{characterId}/equipment/hair"] = newHair;
+        updates[$"users/{userId}/characters/{characterId}/equipment/torso"] = newTorso;
+        updates[$"users/{userId}/characters/{characterId}/equipment/legs"] = newLegs;
+        
+        // Execute all updates atomically
+        dbRef.UpdateChildrenAsync(updates);
     }
 
     private void OnEquipmentChanged(int oldValue, int newValue)

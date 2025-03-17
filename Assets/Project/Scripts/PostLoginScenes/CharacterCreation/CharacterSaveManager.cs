@@ -5,6 +5,7 @@ using Firebase.Extensions;
 using TMPro;
 using UnityEngine.SceneManagement;
 using System.Collections;
+using System.Collections.Generic;
 
 public class CharacterSaveManager : MonoBehaviour
 {
@@ -74,23 +75,43 @@ public class CharacterSaveManager : MonoBehaviour
 
     private void CreateNewCharacter(string userId, string characterName)
     {
-        CharacterData characterData = new CharacterData
-        {
-            characterName = characterName,
-            characterClass = classSelectionManager.GetSelectedClass(),
-            headItemNumber = characterAnimator.headItemNumber,
-            bodyItemNumber = characterAnimator.bodyItemNumber,
-            hairItemNumber = characterAnimator.hairItemNumber,
-            torsoItemNumber = characterAnimator.torsoItemNumber,
-            legsItemNumber = characterAnimator.legsItemNumber,
-            level = 1,
-            experience = 0
-        };
-
+        // Create character key first
         string characterKey = dbReference.Child("users").Child(userId).Child("characters").Push().Key;
-
-        dbReference.Child("users").Child(userId).Child("characters").Child(characterKey)
-            .SetRawJsonValueAsync(JsonUtility.ToJson(characterData))
+        
+        // Create info data
+        Dictionary<string, object> characterInfo = new Dictionary<string, object>
+        {
+            { "characterName", characterName },
+            { "characterClass", classSelectionManager.GetSelectedClass() },
+            { "level", 1 },
+            { "experience", 0 },
+            { "createdAt", ServerValue.Timestamp }
+        };
+        
+        // Create equipment data
+        Dictionary<string, object> characterEquipment = new Dictionary<string, object>
+        {
+            { "head", characterAnimator.headItemNumber },
+            { "body", characterAnimator.bodyItemNumber },
+            { "hair", characterAnimator.hairItemNumber },
+            { "torso", characterAnimator.torsoItemNumber },
+            { "legs", characterAnimator.legsItemNumber }
+        };
+        
+        // Create empty inventory structure
+        Dictionary<string, object> characterInventory = new Dictionary<string, object>
+        {
+            { "capacity", Settings.playerInitialInventoryCapacity }
+        };
+        
+        // Create updates for all paths
+        Dictionary<string, object> updates = new Dictionary<string, object>();
+        updates["users/" + userId + "/characters/" + characterKey + "/info"] = characterInfo;
+        updates["users/" + userId + "/characters/" + characterKey + "/equipment"] = characterEquipment;
+        updates["users/" + userId + "/characters/" + characterKey + "/inventory"] = characterInventory;
+        
+        // Execute all updates atomically
+        dbReference.UpdateChildrenAsync(updates)
             .ContinueWithOnMainThread(task =>
             {
                 if (task.IsCompleted)

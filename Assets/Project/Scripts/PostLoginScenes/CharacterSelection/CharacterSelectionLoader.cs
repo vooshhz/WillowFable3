@@ -52,7 +52,6 @@ public class CharacterSelectionLoader : MonoBehaviour
         LoadCharacterData();
         enterGameButton.onClick.AddListener(EnterGame);
     }
-
     private void LoadCharacterData()
     {
         string userId = FirebaseAuth.DefaultInstance.CurrentUser?.UserId;
@@ -78,14 +77,22 @@ public class CharacterSelectionLoader : MonoBehaviour
                 if (index >= 3) break;
 
                 string charId = characterSnapshot.Key;
-                string charName = characterSnapshot.Child("characterName").Value.ToString();
-                string charClass = characterSnapshot.Child("characterClass").Value.ToString();
-                int charLevel = int.Parse(characterSnapshot.Child("level").Value.ToString());
-                int headItem = int.Parse(characterSnapshot.Child("headItemNumber").Value.ToString());
-                int bodyItem = int.Parse(characterSnapshot.Child("bodyItemNumber").Value.ToString());
-                int hairItem = int.Parse(characterSnapshot.Child("hairItemNumber").Value.ToString());
-                int torsoItem = int.Parse(characterSnapshot.Child("torsoItemNumber").Value.ToString());
-                int legsItem = int.Parse(characterSnapshot.Child("legsItemNumber").Value.ToString());
+                
+                // Get info and equipment data
+                DataSnapshot infoData = characterSnapshot.Child("info");
+                DataSnapshot equipmentData = characterSnapshot.Child("equipment");
+
+                // Read character info
+                string charName = infoData.Child("characterName").Value.ToString();
+                string charClass = infoData.Child("characterClass").Value.ToString();
+                int charLevel = int.Parse(infoData.Child("level").Value.ToString());
+                
+                // Read equipment data
+                int headItem = int.Parse(equipmentData.Child("head").Value.ToString());
+                int bodyItem = int.Parse(equipmentData.Child("body").Value.ToString());
+                int hairItem = int.Parse(equipmentData.Child("hair").Value.ToString());
+                int torsoItem = int.Parse(equipmentData.Child("torso").Value.ToString());
+                int legsItem = int.Parse(equipmentData.Child("legs").Value.ToString());
 
                 if (index == 0)
                 {
@@ -107,7 +114,6 @@ public class CharacterSelectionLoader : MonoBehaviour
             }
         });
     }
-
     private void SetupCharacterPanel(GameObject panel, TMP_Text nameText, TMP_Text classText, TMP_Text levelText, Image panelImage, string charId, string charName, string charClass, int charLevel)
     {
         panel.SetActive(true);
