@@ -248,7 +248,7 @@ MonoBehaviour:
     canBeEaten: 0
     canBeCarried: 0
   - itemCode: 10019
-    itemType: 0
+    itemType: 8
     itemDescription: Grass2
     itemSprite: {fileID: -357145701, guid: 42c6cf6121a6c8d41a94f62dccdc5deb, type: 3}
     itemLongDescription: 
