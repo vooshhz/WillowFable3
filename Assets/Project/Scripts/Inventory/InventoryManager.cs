@@ -92,8 +92,6 @@ public class InventoryManager : MonoBehaviour // Need to check this part and fig
         inventoryItem.itemCode = itemCode;
         inventoryItem.itemQuantity = 1;
         inventoryList.Add(inventoryItem);
-
-        DebugPrintInventoryList(inventoryList);
     }
 
     private void AddItemAtPosition(List<InventoryItem> inventoryList, int itemCode, int position)
@@ -106,8 +104,6 @@ public class InventoryManager : MonoBehaviour // Need to check this part and fig
     
     // Put back in list
     inventoryList[position] = inventoryItem;
-
-    DebugPrintInventoryList(inventoryList);
 }
     /// summary
     /// Populates the itemDetailsDictionary from the scriptable object items list
