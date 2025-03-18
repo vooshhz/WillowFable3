@@ -2,6 +2,8 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using Mirror;
+using System.Collections;
 
 public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
@@ -11,7 +13,6 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     public Image inventorySlotHighlight;
     public Image inventorySlotImage;
     public TextMeshProUGUI textMeshProUGUI;
-    public GameObject player;
     private Transform playerTransform;
     [SerializeField] private UIInventoryBar inventoryBar = null;
     [HideInInspector] public ItemDetails itemDetails;
@@ -22,23 +23,26 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     {
         mainCamera = Camera.main;
         parentItem = GameObject.FindGameObjectWithTag(Tags.ItemsParentTransform).transform;
-        playerTransform = GetPlayerTransform();
+        StartCoroutine(FindLocalPlayer());
     }
 
-private Transform GetPlayerTransform()
-{
-    GameObject player = GameObject.FindWithTag("Player");
-    return player != null ? player.transform : null;
-}
+    private IEnumerator FindLocalPlayer()
+    {
+        while (playerTransform == null)
+            {
+                if (NetworkClient.localPlayer != null)
+                {
+                    playerTransform = NetworkClient.localPlayer.transform;
+                    Debug.Log("Local player transform found: " + playerTransform.position);
+                }
+                yield return new WaitForSeconds(0.5f);
+            }
+    }
+
     private Vector3 GetPlayerPosition()
     {
-        if (playerTransform == null)
-        playerTransform = GetPlayerTransform();
-
-        return playerTransform != null ? playerTransform.position : Vector3.zero;
+        return playerTransform != null ? new Vector3(playerTransform.position.x, playerTransform.position.y + 1, playerTransform.position.z) : Vector3.zero;
     }
-    
-    
 
     public void OnBeginDrag(PointerEventData eventData)
     {
@@ -83,6 +87,25 @@ private Transform GetPlayerTransform()
                     DropSelectedItemAtPlayerPosition();
                 }
             }
+        }
+    }
+
+    public void DropSelectedItemAtPlayerPosition()
+    {
+        if(itemDetails != null)
+        {
+            Vector3 currentPlayerPosition = GetPlayerPosition();
+
+            // Create item from prefab at player position
+            GameObject itemGameObject = Instantiate(itemPrefab, currentPlayerPosition, Quaternion.identity, parentItem);
+            Item item = itemGameObject.GetComponent<Item>();
+            item.ItemCode = itemDetails.itemCode;
+
+            // Remove item from players inventory
+            InventoryManager.Instance.RemoveItem(InventoryLocation.player, item.ItemCode);
+
+            // Save updated inventory to Firebase
+            InventoryManager.Instance.SaveInventoryToFirebase();
         }
     }
 

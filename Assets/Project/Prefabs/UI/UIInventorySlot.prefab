@@ -181,6 +181,7 @@ MonoBehaviour:
   inventorySlotHighlight: {fileID: 8427367649665043337}
   inventorySlotImage: {fileID: 9040542198827546382}
   textMeshProUGUI: {fileID: 5387222256142996177}
+  inventoryBar: {fileID: 0}
   itemDetails:
     itemCode: 0
     itemType: 0
@@ -194,6 +195,7 @@ MonoBehaviour:
     canBeDropped: 0
     canBeEaten: 0
     canBeCarried: 0
+  itemPrefab: {fileID: 9098691780202189608, guid: 7defd2fb390ec2c42933d1aace6a588d, type: 3}
   itemQuantity: 0
 --- !u!1 &6055238331800280568
 GameObject:

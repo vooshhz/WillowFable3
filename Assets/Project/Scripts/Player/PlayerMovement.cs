@@ -10,9 +10,7 @@ public class PlayerMovement : NetworkBehaviour
     private CharacterAnimator characterAnimator;
     private NetworkCharacter networkCharacter; // Reference to the network state handler
     private Rigidbody2D rb;
-    
-    [SyncVar]
-    private bool movementEnabled = true;
+
     private PlayerFacing playerFacing = PlayerFacing.Down;
 
     private void Awake()
@@ -32,19 +30,18 @@ public class PlayerMovement : NetworkBehaviour
         playerInput.actions["Move"].canceled += ctx => moveInput = Vector2.zero;
     }
 
-    private void FixedUpdate()
+   private void FixedUpdate()
 {
-    if (!isLocalPlayer || !movementEnabled) return;
-    
+    if (!isLocalPlayer) return;
         MovePlayer();
         UpdatePlayerFacing();
+        UpdateAnimationState(); 
         UpdateAnimationState();
 }
     private void MovePlayer()
     {
-        if(!movementEnabled) return;
-
         Vector2 moveVector = moveInput * moveSpeed * Time.fixedDeltaTime;
+
         // Apply movement using Rigidbody2D for proper collision handling
         rb.MovePosition(rb.position + moveVector);
     }
@@ -82,59 +79,15 @@ public class PlayerMovement : NetworkBehaviour
             networkCharacter.CmdUpdateState(newState, playerFacing);
         }
     }
-    public PlayerFacing GetCurrentFacing()
-        {
-            return playerFacing;
-        }
+    // Add these methods to PlayerMovement
+public PlayerFacing GetCurrentFacing()
+{
+    return playerFacing;
+}
 
-    public bool IsMoving()
-        {
-            return moveInput != Vector2.zero;
-        }
-
-    // Methods to enable/disable movement locally
-    public void EnableMovement()
-    {
-        if (isLocalPlayer)
-        {
-            CmdSetMovementEnabled(true);
-        }
-    }
-    
-    public void DisableMovement()
-    {
-        if (isLocalPlayer)
-        {
-            CmdSetMovementEnabled(false);
-        }
-    }
-    
-    // Command to set movement state on the server
-    [Command]
-    private void CmdSetMovementEnabled(bool enabled)
-    {
-        movementEnabled = enabled;
-        RpcSyncMovementState(enabled);
-    }
-    
-    // Notify all clients about the movement state change
-    [ClientRpc]
-    private void RpcSyncMovementState(bool enabled)
-    {
-        movementEnabled = enabled;
-        
-        // If movement is disabled, also stop any current movement
-        if (!enabled)
-        {
-            moveInput = Vector2.zero;
-            if (rb != null) rb.velocity = Vector2.zero;
-        }
-    }
-    
-    // Public method to check if movement is currently enabled
-    public bool IsMovementEnabled()
-    {
-        return movementEnabled;
-    }
+public bool IsMoving()
+{
+    return moveInput != Vector2.zero;
+}
 
 }

@@ -84,6 +84,42 @@ public class InventoryManager : MonoBehaviour // Need to check this part and fig
         inventoryBar.InventoryUpdated(inventoryLocation, inventoryList);
     }
 
+    public void RemoveItem(InventoryLocation inventoryLocation, int itemCode)
+{
+    List<InventoryItem> inventoryList = inventoryLists[(int)inventoryLocation];
+
+    // Check if inventory already contains the item
+    int itemPosition = FindItemInInventory(inventoryLocation, itemCode);
+
+    if(itemPosition != -1)
+    {
+        RemoveItemAtPosition(inventoryList, itemCode, itemPosition);
+
+        // Save updated inventory to Firebase
+        SaveInventoryToFirebase();
+
+        // Reload inventory from Firebase to update UI
+        LoadInventoryFromFirebase();
+    }
+}
+
+    private void RemoveItemAtPosition(List<InventoryItem> inventoryList, int itemCode, int position)
+{
+    InventoryItem inventoryItem = new InventoryItem();
+
+    int quantity = inventoryList[position].itemQuantity -1;
+
+    if(quantity > 0)
+    {
+        inventoryItem.itemQuantity = quantity;
+        inventoryItem.itemCode = itemCode;
+        inventoryList[position] = inventoryItem;        
+    }
+    else
+    {
+        inventoryList.RemoveAt(position);
+    }
+}
     public int FindItemInInventory(InventoryLocation inventoryLocation, int itemCode)
     {
         List<InventoryItem> inventoryList = inventoryLists[(int)inventoryLocation];
@@ -187,7 +223,7 @@ public class InventoryManager : MonoBehaviour // Need to check this part and fig
     }
 }
 
-      public void SaveInventoryToFirebase()
+    public void SaveInventoryToFirebase()
     {
         string userId = FirebaseAuth.DefaultInstance.CurrentUser?.UserId;
         string characterId = PlayerPrefs.GetString("SelectedCharacterId", null);
@@ -219,7 +255,7 @@ public class InventoryManager : MonoBehaviour // Need to check this part and fig
                 }
             });
     }
-     public void LoadInventoryFromFirebase()
+    public void LoadInventoryFromFirebase()
     {
         string userId = FirebaseAuth.DefaultInstance.CurrentUser?.UserId;
         string characterId = PlayerPrefs.GetString("SelectedCharacterId", null);
