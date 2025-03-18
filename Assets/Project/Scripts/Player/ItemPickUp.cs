@@ -19,6 +19,9 @@ public class ItemPickUp : MonoBehaviour
             {
                 // Add item to Inventory
                 InventoryManager.Instance.AddItem(InventoryLocation.player, item, collision.gameObject);
+
+                // Save inventory to Firebase
+                InventoryManager.Instance.SaveInventoryToFirebase();
             }
         }
     }

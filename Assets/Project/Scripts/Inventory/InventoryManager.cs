@@ -2,13 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Firebase.Database;
+using Firebase.Auth;
+using Firebase.Extensions;
 
 public class InventoryManager : MonoBehaviour // Need to check this part and figure out singleton without inherting
 {
     public UIInventoryBar inventoryBar;
     public static InventoryManager Instance { get; private set; }
     private Dictionary<int, ItemDetails> itemDetailsDictionary;
-
+    private DatabaseReference dbReference;
     public List<InventoryItem>[] inventoryLists;
     [HideInInspector] public int[] inventoryListCapacityIntArray; // the index of the array is the inventory lits (from the InventoryLocation enum), 
     // and the value is the capacity of that inventory list
@@ -30,6 +33,14 @@ public class InventoryManager : MonoBehaviour // Need to check this part and fig
 
         // Create inventory lists
         CreateInventoryLists();
+    }
+
+    private void Start() 
+    {
+        dbReference = FirebaseDatabase.GetInstance("https://willowfable3-default-rtdb.firebaseio.com/").RootReference;
+        
+        // Load inventory when game starts
+        LoadInventoryFromFirebase();
     }
     private void CreateInventoryLists()
     {
@@ -176,4 +187,94 @@ public class InventoryManager : MonoBehaviour // Need to check this part and fig
     }
 }
 
-  }
+      public void SaveInventoryToFirebase()
+    {
+        string userId = FirebaseAuth.DefaultInstance.CurrentUser?.UserId;
+        string characterId = PlayerPrefs.GetString("SelectedCharacterId", null);
+        
+        if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(characterId))
+        {
+            Debug.LogError("Cannot save inventory: User ID or Character ID is missing");
+            return;
+        }
+        
+        InventoryData inventoryData = new InventoryData
+        {
+            items = inventoryLists[(int)InventoryLocation.player]
+        };
+        
+        string inventoryJson = JsonUtility.ToJson(inventoryData);
+        
+        // Save to Firebase under the character path
+        dbReference.Child("users").Child(userId).Child("characters").Child(characterId)
+            .Child("inventory").SetRawJsonValueAsync(inventoryJson)
+            .ContinueWithOnMainThread(task => {
+                if (task.IsCompleted)
+                {
+                    Debug.Log("Inventory saved successfully!");
+                }
+                else
+                {
+                    Debug.LogError($"Failed to save inventory: {task.Exception}");
+                }
+            });
+    }
+     public void LoadInventoryFromFirebase()
+    {
+        string userId = FirebaseAuth.DefaultInstance.CurrentUser?.UserId;
+        string characterId = PlayerPrefs.GetString("SelectedCharacterId", null);
+        
+        if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(characterId))
+        {
+            Debug.LogError("Cannot load inventory: User ID or Character ID is missing");
+            return;
+        }
+        
+        dbReference.Child("users").Child(userId).Child("characters").Child(characterId)
+            .Child("inventory").GetValueAsync().ContinueWithOnMainThread(task => {
+                if (task.IsFaulted)
+                {
+                    Debug.LogError($"Failed to load inventory: {task.Exception}");
+                    return;
+                }
+                
+                if (task.IsCompleted)
+                {
+                    DataSnapshot snapshot = task.Result;
+                    
+                    if (snapshot.Exists)
+                    {
+                        try
+                        {
+                            string json = snapshot.GetRawJsonValue();
+                            InventoryData inventoryData = JsonUtility.FromJson<InventoryData>(json);
+                            
+                            // Replace the current inventory with the loaded one
+                            inventoryLists[(int)InventoryLocation.player] = inventoryData.items;
+                            
+                            // Update UI
+                            if (inventoryBar != null)
+                            {
+                                inventoryBar.InventoryUpdated(InventoryLocation.player, inventoryLists[(int)InventoryLocation.player]);
+                            }
+                            else
+                            {
+                                Debug.LogWarning("Inventory bar is not initialized yet.");
+                            }
+                            
+                            Debug.Log("Inventory loaded successfully!");
+                        }
+                        catch (System.Exception e)
+                        {
+                            Debug.LogError($"Error parsing inventory data: {e.Message}");
+                        }
+                    }
+                    else
+                    {
+                        Debug.Log("No inventory data found. Starting with empty inventory.");
+                    }
+                }
+            });
+    }
+
+}  
