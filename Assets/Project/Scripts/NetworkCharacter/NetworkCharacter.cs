@@ -24,6 +24,7 @@ public class NetworkCharacter : NetworkBehaviour
     [SyncVar(hook = nameof(OnDirectionChanged))]
     public PlayerFacing currentDirection = PlayerFacing.Down;
 
+
     public CharacterAnimator characterAnimator; // Assign in Inspector
     private DatabaseReference dbRef;
     private string userId;
@@ -105,8 +106,8 @@ public class NetworkCharacter : NetworkBehaviour
         LoadCharacterDataFromFirebaseServer();
     }
 
-[Server]
-private void LoadCharacterDataFromFirebaseServer()
+    [Server]
+    private void LoadCharacterDataFromFirebaseServer()
 {
     dbRef.Child("users").Child(userId).Child("characters").Child(characterId).GetValueAsync()
         .ContinueWithOnMainThread(task =>
@@ -156,21 +157,23 @@ private void LoadCharacterDataFromFirebaseServer()
         SaveEquipmentToFirebase(newHead, newBody, newHair, newTorso, newLegs);
     }
 
-    [Server]
+   [Server]
     private void SaveEquipmentToFirebase(int newHead, int newBody, int newHair, int newTorso, int newLegs)
+{
+    // Create a dictionary for the equipment data
+    Dictionary<string, object> equipmentData = new Dictionary<string, object>
     {
-        Dictionary<string, object> updates = new Dictionary<string, object>();
-        
-        // Update equipment values using the new path
-        updates[$"users/{userId}/characters/{characterId}/equipment/head"] = newHead;
-        updates[$"users/{userId}/characters/{characterId}/equipment/body"] = newBody;
-        updates[$"users/{userId}/characters/{characterId}/equipment/hair"] = newHair;
-        updates[$"users/{userId}/characters/{characterId}/equipment/torso"] = newTorso;
-        updates[$"users/{userId}/characters/{characterId}/equipment/legs"] = newLegs;
-        
-        // Execute all updates atomically
-        dbRef.UpdateChildrenAsync(updates);
-    }
+        { "head", newHead },
+        { "body", newBody },
+        { "hair", newHair },
+        { "torso", newTorso },
+        { "legs", newLegs }
+    };
+    
+    // Update the equipment node
+    dbRef.Child("users").Child(userId).Child("characters").Child(characterId)
+         .Child("equipment").UpdateChildrenAsync(equipmentData);
+}
 
     private void OnEquipmentChanged(int oldValue, int newValue)
     {
