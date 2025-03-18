@@ -37,13 +37,8 @@ private Transform GetPlayerTransform()
 
         return playerTransform != null ? playerTransform.position : Vector3.zero;
     }
-    private void DropSelectedItemAtPlayerPosition()
-    {
-        if (itemDetails != null)
-        {
-            //Vector3 playerPosition = 
-        }
-    }
+    
+    
 
     public void OnBeginDrag(PointerEventData eventData)
     {

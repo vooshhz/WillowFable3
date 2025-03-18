@@ -58,15 +58,14 @@ public class Player : NetworkBehaviour
         base.OnStopClient();
     }
 
-    private void OnDestroy()
+   
     {
         // Unregister from dictionary
         if (!string.IsNullOrEmpty(playerId) && _allPlayers.ContainsKey(playerId))
             _allPlayers.Remove(playerId);
     }
 
-    // Get player by ID
-    public static Player GetPlayer(string id)
+   
     {
         if (_allPlayers.TryGetValue(id, out Player player))
             return player;
