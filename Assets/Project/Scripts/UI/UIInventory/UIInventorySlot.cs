@@ -5,25 +5,134 @@ using UnityEngine.EventSystems;
 using Mirror;
 using System.Collections;
 
-public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+public class UIInventorySlot : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
     private Camera mainCamera;
+    private Canvas parentCanvas;
     private Transform parentItem;
     private GameObject draggedItem;
     public Image inventorySlotHighlight;
     public Image inventorySlotImage;
     public TextMeshProUGUI textMeshProUGUI;
     private Transform playerTransform;
+
+      // Track if this slot is currently selected
+    private bool isSelected = false;
+    
+    // Reference to the currently selected slot (static so only one slot can be selected at a time)
+    private GameObject selectedItemVisual;
+
+    private static UIInventorySlot currentlySelectedSlot = null;
+
     [SerializeField] private UIInventoryBar inventoryBar = null;
     [HideInInspector] public ItemDetails itemDetails;
     [SerializeField] private GameObject itemPrefab = null;
     [HideInInspector] public int itemQuantity;
+    [SerializeField] private GameObject inventoryTextBoxPrefab = null;
+    [SerializeField] private int slotNumber = 0;
 
+    private void Awake() 
+    {
+        parentCanvas = GetComponentInParent<Canvas>();
+    }
     private void Start() 
     {
         mainCamera = Camera.main;
         parentItem = GameObject.FindGameObjectWithTag(Tags.ItemsParentTransform).transform;
         StartCoroutine(FindLocalPlayer());
+    }
+
+    private void Update() 
+    {
+        // If this slot is selected and player clicks on the game world (not UI)
+        if (isSelected && Input.GetMouseButtonDown(0))
+        {
+            // Check if the click was on a UI element
+            if (!EventSystem.current.IsPointerOverGameObject())
+            {
+                DropSelectedItemAtPlayerPosition();
+                UnselectItem();
+            }
+        }
+        
+        // Move the selected item visual to follow the mouse
+        if (isSelected && selectedItemVisual != null)
+        {
+            selectedItemVisual.transform.position = Input.mousePosition;
+        }
+    }
+
+     public void OnPointerClick(PointerEventData eventData)
+    {
+        // If there's already a selected slot and it's not this one, perform swap
+        if (currentlySelectedSlot != null && currentlySelectedSlot != this)
+        {
+            // Get the slot numbers
+            int fromSlot = currentlySelectedSlot.slotNumber;
+            int toSlot = this.slotNumber;
+            
+            // Perform the swap in InventoryManager
+            InventoryManager.Instance.SwapInventoryItems(InventoryLocation.player, fromSlot, toSlot);
+            
+            //Destroy inventory text box
+            DestroyInventoryTextBox();
+
+            // Unselect the current slot
+            currentlySelectedSlot.UnselectItem();
+            
+            return;
+        }
+        // Toggle selected state
+        if (!isSelected)
+        {
+            SelectItem();
+        }
+        else
+        {
+            UnselectItem();
+        }
+    }
+
+    private void SelectItem()
+    {
+        if (itemDetails == null) return;
+
+        // Set as currently selected
+        isSelected = true;
+        currentlySelectedSlot = this;
+        
+        // Highlight the slot
+        inventorySlotHighlight.color = new Color(1f, 1f, 1f, 1f);
+        
+        // Create visual representation
+        selectedItemVisual = Instantiate(inventoryBar.inventoryBarDraggedItem, inventoryBar.transform);
+        
+        // Set the visual's image
+        Image selectedItemImage = selectedItemVisual.GetComponentInChildren<Image>();
+        selectedItemImage.sprite = inventorySlotImage.sprite;
+        
+        // Set initial position to mouse
+        selectedItemVisual.transform.position = Input.mousePosition;
+    }
+
+    private void UnselectItem()
+    {
+        isSelected = false;
+        
+        if (currentlySelectedSlot == this)
+        {
+            currentlySelectedSlot = null;
+        }
+        
+        // Remove highlight
+        inventorySlotHighlight.color = new Color(1f, 1f, 1f, 0f);
+        
+        // Destroy the visual
+        if (selectedItemVisual != null)
+        {
+            Destroy(selectedItemVisual);
+            selectedItemVisual = null;
+        }
     }
 
     private IEnumerator FindLocalPlayer()
@@ -39,74 +148,77 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
             }
     }
 
-    private Vector3 GetPlayerPosition()
+    private void DropSelectedItemAtPlayerPosition()
     {
-        return playerTransform != null ? new Vector3(playerTransform.position.x, playerTransform.position.y + 1, playerTransform.position.z) : Vector3.zero;
-    }
-
-    public void OnBeginDrag(PointerEventData eventData)
-    {
-        if(itemDetails != null)
+        if (itemDetails == null || !itemDetails.canBeDropped) return;
+        
+        // Check if player transform exists
+        if (playerTransform == null)
         {
-            // Instantiate gameObject as dragged item
-            draggedItem = Instantiate(inventoryBar.inventoryBarDraggedItem, inventoryBar.transform);
-
-            // Get image for dragged item
-            Image draggedItemImage = draggedItem.GetComponentInChildren<Image>();
-            draggedItemImage.sprite = inventorySlotImage.sprite;
+            Debug.LogError("Player transform reference is missing!");
+            return;
+        }
+        
+        if (itemPrefab == null)
+        {
+            Debug.LogError("Item prefab is not assigned!");
+            return;
+        }
+        
+        // Get player position with offset
+        Vector3 dropPosition = playerTransform.position + new Vector3(0, 2, 0);
+        
+        // Create the item at player position
+        GameObject newItem = Instantiate(itemPrefab, dropPosition, Quaternion.identity, parentItem);
+        
+        // Set up the item
+        Item itemComponent = newItem.GetComponent<Item>();
+        if (itemComponent != null)
+        {
+            itemComponent.Init(itemDetails.itemCode);
+            
+            // Use InventoryManager to remove item from inventory
+            InventoryManager.Instance.RemoveItem(InventoryLocation.player, itemDetails.itemCode);
         }
     }
 
-    public void OnDrag(PointerEventData eventData)
+    public void OnPointerEnter(PointerEventData eventData)
     {
-        // move game object as dragged item
-        if(draggedItem != null)
+        if(itemQuantity != 0)
         {
-            draggedItem.transform.position = Input.mousePosition;
-        }
-    }
+            inventoryBar.inventoryTextBoxGameobject = Instantiate(inventoryTextBoxPrefab, transform.position, Quaternion.identity);
+            inventoryBar.inventoryTextBoxGameobject.transform.SetParent(parentCanvas.transform, false);
 
-    public void OnEndDrag(PointerEventData eventData)
-    {
-        // Destroy game object as dragged item
-        if (draggedItem != null)
-        {
-            Destroy(draggedItem);
+            UIInventoryTextBox inventoryTextBox = inventoryBar.inventoryTextBoxGameobject.GetComponent<UIInventoryTextBox>();
+                
+            string itemTypeDescription = InventoryManager.Instance.GetItemTypeDescription(itemDetails.itemType);
 
-            // If drag ends over inventory bar, get item drag is over and swap them 
+            inventoryTextBox.SetTextboxText(itemDetails.itemDescription, itemTypeDescription, "", itemDetails.itemLongDescription, "", "");
 
-            if(eventData.pointerCurrentRaycast.gameObject != null && eventData.pointerCurrentRaycast.gameObject.GetComponent<UIInventorySlot>() != null)
+            if (inventoryBar.IsInventoryBarPositionBottom)
             {
-
+                inventoryBar.inventoryTextBoxGameobject.GetComponent<RectTransform>().pivot = new Vector2(0.5f, 0f);
+                inventoryBar.inventoryTextBoxGameobject.transform.position = new Vector3(transform.position.x, transform.position.y + 50f, transform.position.z);
             }
-            // else attempt to drop the item if it can be dropped
+
             else
             {
-                if (itemDetails.canBeDropped)
-                {
-                    DropSelectedItemAtPlayerPosition();
-                }
+                inventoryBar.inventoryTextBoxGameobject.GetComponent<RectTransform>().pivot = new Vector2(0.5f, 1f);
+                inventoryBar.inventoryTextBoxGameobject.transform.position = new Vector3(transform.position.x, transform.position.y - 50f, transform.position.z);
             }
         }
     }
 
-    public void DropSelectedItemAtPlayerPosition()
+    public void OnPointerExit(PointerEventData eventData)
     {
-        if(itemDetails != null)
-        {
-            Vector3 currentPlayerPosition = GetPlayerPosition();
-
-            // Create item from prefab at player position
-            GameObject itemGameObject = Instantiate(itemPrefab, currentPlayerPosition, Quaternion.identity, parentItem);
-            Item item = itemGameObject.GetComponent<Item>();
-            item.ItemCode = itemDetails.itemCode;
-
-            // Remove item from players inventory
-            InventoryManager.Instance.RemoveItem(InventoryLocation.player, item.ItemCode);
-
-            // Save updated inventory to Firebase
-            InventoryManager.Instance.SaveInventoryToFirebase();
-        }
+        DestroyInventoryTextBox();
     }
 
+    public void DestroyInventoryTextBox()
+    {
+        if (inventoryBar.inventoryTextBoxGameobject != null)
+        {
+            Destroy(inventoryBar.inventoryTextBoxGameobject);
+        }
+    }
 }

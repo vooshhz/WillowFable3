@@ -215,9 +215,17 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8013746535837820127, guid: acd5ada921b319540bca31134162b67d, type: 3}
+      propertyPath: slotNumber
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 8013746535837820127, guid: acd5ada921b319540bca31134162b67d, type: 3}
       propertyPath: inventoryBar
       value: 
       objectReference: {fileID: 623545423}
+    - target: {fileID: 8013746535837820127, guid: acd5ada921b319540bca31134162b67d, type: 3}
+      propertyPath: inventoryTextBoxPrefab
+      value: 
+      objectReference: {fileID: 755936257230667588, guid: a6226eaa74ecdd24da500ed6f26acfe4, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -332,9 +340,17 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8013746535837820127, guid: acd5ada921b319540bca31134162b67d, type: 3}
+      propertyPath: slotNumber
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8013746535837820127, guid: acd5ada921b319540bca31134162b67d, type: 3}
       propertyPath: inventoryBar
       value: 
       objectReference: {fileID: 623545423}
+    - target: {fileID: 8013746535837820127, guid: acd5ada921b319540bca31134162b67d, type: 3}
+      propertyPath: inventoryTextBoxPrefab
+      value: 
+      objectReference: {fileID: 755936257230667588, guid: a6226eaa74ecdd24da500ed6f26acfe4, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -544,9 +560,17 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8013746535837820127, guid: acd5ada921b319540bca31134162b67d, type: 3}
+      propertyPath: slotNumber
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 8013746535837820127, guid: acd5ada921b319540bca31134162b67d, type: 3}
       propertyPath: inventoryBar
       value: 
       objectReference: {fileID: 623545423}
+    - target: {fileID: 8013746535837820127, guid: acd5ada921b319540bca31134162b67d, type: 3}
+      propertyPath: inventoryTextBoxPrefab
+      value: 
+      objectReference: {fileID: 755936257230667588, guid: a6226eaa74ecdd24da500ed6f26acfe4, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -693,9 +717,17 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8013746535837820127, guid: acd5ada921b319540bca31134162b67d, type: 3}
+      propertyPath: slotNumber
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8013746535837820127, guid: acd5ada921b319540bca31134162b67d, type: 3}
       propertyPath: inventoryBar
       value: 
       objectReference: {fileID: 623545423}
+    - target: {fileID: 8013746535837820127, guid: acd5ada921b319540bca31134162b67d, type: 3}
+      propertyPath: inventoryTextBoxPrefab
+      value: 
+      objectReference: {fileID: 755936257230667588, guid: a6226eaa74ecdd24da500ed6f26acfe4, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -810,9 +842,17 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8013746535837820127, guid: acd5ada921b319540bca31134162b67d, type: 3}
+      propertyPath: slotNumber
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 8013746535837820127, guid: acd5ada921b319540bca31134162b67d, type: 3}
       propertyPath: inventoryBar
       value: 
       objectReference: {fileID: 623545423}
+    - target: {fileID: 8013746535837820127, guid: acd5ada921b319540bca31134162b67d, type: 3}
+      propertyPath: inventoryTextBoxPrefab
+      value: 
+      objectReference: {fileID: 755936257230667588, guid: a6226eaa74ecdd24da500ed6f26acfe4, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -949,6 +989,7 @@ MonoBehaviour:
   - {fileID: 562118270}
   - {fileID: 316289309}
   inventoryBarDraggedItem: {fileID: 702918946076582355, guid: ece8d66bc037e594198a5f09ba2d194b, type: 3}
+  inventoryTextBoxGameobject: {fileID: 0}
 --- !u!1 &769735244
 GameObject:
   m_ObjectHideFlags: 0
@@ -1228,9 +1269,17 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8013746535837820127, guid: acd5ada921b319540bca31134162b67d, type: 3}
+      propertyPath: slotNumber
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8013746535837820127, guid: acd5ada921b319540bca31134162b67d, type: 3}
       propertyPath: inventoryBar
       value: 
       objectReference: {fileID: 623545423}
+    - target: {fileID: 8013746535837820127, guid: acd5ada921b319540bca31134162b67d, type: 3}
+      propertyPath: inventoryTextBoxPrefab
+      value: 
+      objectReference: {fileID: 755936257230667588, guid: a6226eaa74ecdd24da500ed6f26acfe4, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1458,9 +1507,17 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8013746535837820127, guid: acd5ada921b319540bca31134162b67d, type: 3}
+      propertyPath: slotNumber
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 8013746535837820127, guid: acd5ada921b319540bca31134162b67d, type: 3}
       propertyPath: inventoryBar
       value: 
       objectReference: {fileID: 623545423}
+    - target: {fileID: 8013746535837820127, guid: acd5ada921b319540bca31134162b67d, type: 3}
+      propertyPath: inventoryTextBoxPrefab
+      value: 
+      objectReference: {fileID: 755936257230667588, guid: a6226eaa74ecdd24da500ed6f26acfe4, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1677,9 +1734,17 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8013746535837820127, guid: acd5ada921b319540bca31134162b67d, type: 3}
+      propertyPath: slotNumber
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8013746535837820127, guid: acd5ada921b319540bca31134162b67d, type: 3}
       propertyPath: inventoryBar
       value: 
       objectReference: {fileID: 623545423}
+    - target: {fileID: 8013746535837820127, guid: acd5ada921b319540bca31134162b67d, type: 3}
+      propertyPath: inventoryTextBoxPrefab
+      value: 
+      objectReference: {fileID: 755936257230667588, guid: a6226eaa74ecdd24da500ed6f26acfe4, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1794,9 +1859,17 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8013746535837820127, guid: acd5ada921b319540bca31134162b67d, type: 3}
+      propertyPath: slotNumber
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8013746535837820127, guid: acd5ada921b319540bca31134162b67d, type: 3}
       propertyPath: inventoryBar
       value: 
       objectReference: {fileID: 623545423}
+    - target: {fileID: 8013746535837820127, guid: acd5ada921b319540bca31134162b67d, type: 3}
+      propertyPath: inventoryTextBoxPrefab
+      value: 
+      objectReference: {fileID: 755936257230667588, guid: a6226eaa74ecdd24da500ed6f26acfe4, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1911,9 +1984,17 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8013746535837820127, guid: acd5ada921b319540bca31134162b67d, type: 3}
+      propertyPath: slotNumber
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8013746535837820127, guid: acd5ada921b319540bca31134162b67d, type: 3}
       propertyPath: inventoryBar
       value: 
       objectReference: {fileID: 623545423}
+    - target: {fileID: 8013746535837820127, guid: acd5ada921b319540bca31134162b67d, type: 3}
+      propertyPath: inventoryTextBoxPrefab
+      value: 
+      objectReference: {fileID: 755936257230667588, guid: a6226eaa74ecdd24da500ed6f26acfe4, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2194,9 +2275,17 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8013746535837820127, guid: acd5ada921b319540bca31134162b67d, type: 3}
+      propertyPath: slotNumber
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 8013746535837820127, guid: acd5ada921b319540bca31134162b67d, type: 3}
       propertyPath: inventoryBar
       value: 
       objectReference: {fileID: 623545423}
+    - target: {fileID: 8013746535837820127, guid: acd5ada921b319540bca31134162b67d, type: 3}
+      propertyPath: inventoryTextBoxPrefab
+      value: 
+      objectReference: {fileID: 755936257230667588, guid: a6226eaa74ecdd24da500ed6f26acfe4, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2314,6 +2403,10 @@ PrefabInstance:
       propertyPath: inventoryBar
       value: 
       objectReference: {fileID: 623545423}
+    - target: {fileID: 8013746535837820127, guid: acd5ada921b319540bca31134162b67d, type: 3}
+      propertyPath: inventoryTextBoxPrefab
+      value: 
+      objectReference: {fileID: 755936257230667588, guid: a6226eaa74ecdd24da500ed6f26acfe4, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

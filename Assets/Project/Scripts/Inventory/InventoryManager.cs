@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 using Firebase.Database;
 using Firebase.Auth;
 using Firebase.Extensions;
+using Unity.VisualScripting;
 
 public class InventoryManager : MonoBehaviour // Need to check this part and figure out singleton without inherting
 {
@@ -160,6 +161,44 @@ public class InventoryManager : MonoBehaviour // Need to check this part and fig
     /// </summary>
     /// 
 
+    public void SwapInventoryItems(InventoryLocation inventoryLocation, int fromSlot, int toSlot)
+    {
+        // Get the inventory list for the specified location (player)
+        List<InventoryItem> inventoryList = inventoryLists[(int)inventoryLocation];
+        
+        // Check if both slots are within valid range
+        if (fromSlot < inventoryList.Count && (toSlot < inventoryList.Count || toSlot == inventoryList.Count))
+        {
+            // Case 1: Moving to an empty slot (at the end of the list)
+            if (toSlot == inventoryList.Count)
+            {
+                // Create new item at destination
+                InventoryItem item = inventoryList[fromSlot];
+                inventoryList.Add(item);
+                
+                // Remove from original position
+                inventoryList.RemoveAt(fromSlot);
+            }
+            // Case 2: Swapping two existing items
+            else
+            {
+                // Store items
+                InventoryItem fromItem = inventoryList[fromSlot];
+                InventoryItem toItem = inventoryList[toSlot];
+                
+                // Swap the items
+                inventoryList[fromSlot] = toItem;
+                inventoryList[toSlot] = fromItem;
+            }
+            
+            // Update UI
+            inventoryBar.InventoryUpdated(inventoryLocation, inventoryList);
+            
+            // Persist changes to Firebase
+            SaveInventoryToFirebase();
+        }
+}
+
     private void CreateItemDetailsDictionary()
     {
         itemDetailsDictionary = new Dictionary<int, ItemDetails>();
@@ -188,6 +227,43 @@ public class InventoryManager : MonoBehaviour // Need to check this part and fig
             return null;
         }
 
+    }
+
+    public string GetItemTypeDescription(ItemType itemType)
+    {
+        string itemTypeDescription;
+        switch(itemType)
+        {
+            case ItemType.Breaking_tool:
+            itemTypeDescription = Settings.BreakingTool;
+            break;
+
+            case ItemType.Chopping_tool:
+            itemTypeDescription = Settings.ChoppingTool;
+            break;
+
+            case ItemType.Hoeing_tool:
+            itemTypeDescription = Settings.HoeingTool;
+            break;
+
+            case ItemType.Reaping_tool:
+            itemTypeDescription = Settings.ReapingTool;
+            break;
+
+            case ItemType.Watering_tool:
+            itemTypeDescription = Settings.WateringTool;
+            break;
+
+            case ItemType.Collecting_tool:
+            itemTypeDescription = Settings.CollectingTool;
+            break;
+
+            default:
+            itemTypeDescription = itemType.ToString();
+            break;           
+        }
+
+        return itemTypeDescription;
     }
 
     public void InitializeInventoryBar()
