@@ -37,3 +37,17 @@ public enum ItemType
     count
 }
 
+public enum GridBoolProperty
+{
+    diggable,
+    canDropItem,
+    canPlaceFurniture,
+    isPath,
+    isNPCObstacle
+}
+
+public enum SceneName
+{
+    Scene_IntroScene
+}
+

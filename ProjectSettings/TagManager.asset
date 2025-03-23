@@ -6,6 +6,9 @@ TagManager:
   tags:
   - BoundsConfiner
   - ItemsParentTransform
+  - GroundDecorations1
+  - GroundDecorations2
+  - CropsParentTransform
   layers:
   - Default
   - TransparentFX
@@ -43,6 +46,30 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Ground1
+    uniqueID: 753244381
+    locked: 0
+  - name: Ground2
+    uniqueID: 1930510339
+    locked: 0
+  - name: Ground3
+    uniqueID: 877590569
+    locked: 0
+  - name: GroundDecoration1
+    uniqueID: 4287708809
+    locked: 0
+  - name: GroundDecoration2
+    uniqueID: 3400699273
+    locked: 0
   - name: Instances
     uniqueID: 3838831751
+    locked: 0
+  - name: Front1
+    uniqueID: 3631827601
+    locked: 0
+  - name: Front2
+    uniqueID: 3350096643
+    locked: 0
+  - name: Collisions
+    uniqueID: 2766628767
     locked: 0

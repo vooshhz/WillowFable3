@@ -1311,6 +1311,8 @@ GameObject:
   m_Component:
   - component: {fileID: 873363004}
   - component: {fileID: 873363005}
+  - component: {fileID: 873363007}
+  - component: {fileID: 873363006}
   m_Layer: 0
   m_Name: InitializeUI
   m_TagString: Untagged
@@ -1346,6 +1348,37 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   inventoryBar: {fileID: 623545419}
+--- !u!114 &873363006
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 873363003}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 36113983d9690714d9ff38237dd55be5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  grid: {fileID: 0}
+  so_gridPropertiesArray:
+  - {fileID: 11400000, guid: 39fdc8981b9b2bd4e9b2d390ca0726ea, type: 2}
+--- !u!114 &873363007
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 873363003}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d20c4e359436fc54b9717fdcb8ec7c5f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fadeDuration: 1
+  faderCanvasGroup: {fileID: 0}
+  faderImage: {fileID: 0}
+  startingSceneName: 0
 --- !u!1 &901209602
 GameObject:
   m_ObjectHideFlags: 0

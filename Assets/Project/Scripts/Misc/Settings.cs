@@ -19,4 +19,6 @@ public static class Settings
     public const string WateringTool = "Watering Can";
     public const string CollectingTool = "Basket";
 
+    // Tilemap
+    public const float gridCellSize = 1f; // grid cell size in unity units
 }
