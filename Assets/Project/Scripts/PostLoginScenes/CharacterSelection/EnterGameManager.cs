@@ -2,15 +2,11 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Collections;
-using UnityEditor;
 
 public class EnterGameManager : MonoBehaviour
 {
     [SerializeField] private Button enterGameButton; // Assign the Enter Game button in the Inspector
     [SerializeField] private string persistentScene;
-    [SerializeField] private string playerUIScene;
-    [SerializeField] private string introScene;
-
     private string selectedCharacterId = null;
 
     private void Start()
@@ -56,8 +52,6 @@ public class EnterGameManager : MonoBehaviour
     private IEnumerator LoadScenesSequentially()
     {
         yield return LoadSceneIfNotLoaded(persistentScene);
-        yield return LoadSceneIfNotLoaded(playerUIScene);
-        yield return LoadSceneIfNotLoaded(introScene);
     }
 
     private IEnumerator LoadSceneIfNotLoaded(string scene)

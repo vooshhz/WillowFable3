@@ -21,8 +21,8 @@ public class CharacterSaveManager : MonoBehaviour
         dbReference = FirebaseDatabase.GetInstance("https://willowfable3-default-rtdb.firebaseio.com/").RootReference;
     }
 
-public void SaveCharacterData()
-{
+    public void SaveCharacterData()
+    {
     FirebaseUser user = FirebaseAuth.DefaultInstance.CurrentUser;
 
     if (user == null)
@@ -105,6 +105,15 @@ public void SaveCharacterData()
             { "experience", 0 },
             { "createdAt", ServerValue.Timestamp }
         };
+
+        // Create location data
+        Dictionary<string, object> location = new Dictionary<string, object>
+        {
+            { "sceneName", "Scene_IntroScene" },
+            { "x", 0 },
+            { "y", 0 },
+            { "z", 0 }
+        };
         
         // Create equipment data
         Dictionary<string, object> characterEquipment = new Dictionary<string, object>
@@ -121,12 +130,16 @@ public void SaveCharacterData()
         {
             { "capacity", Settings.playerInitialInventoryCapacity }
         };
+
         
         // Create updates for all paths
         Dictionary<string, object> updates = new Dictionary<string, object>();
         updates["users/" + userId + "/characters/" + characterKey + "/info"] = characterInfo;
         updates["users/" + userId + "/characters/" + characterKey + "/equipment"] = characterEquipment;
         updates["users/" + userId + "/characters/" + characterKey + "/inventory"] = characterInventory;
+        updates["users/" + userId + "/characters/" + characterKey + "/location"] = location;
+
+
         
         // Execute all updates atomically
         dbReference.UpdateChildrenAsync(updates)

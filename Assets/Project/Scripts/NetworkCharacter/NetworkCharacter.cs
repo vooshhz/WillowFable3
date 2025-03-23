@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement;
 using Cinemachine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 public class NetworkCharacter : NetworkBehaviour
 {
@@ -15,8 +16,6 @@ public class NetworkCharacter : NetworkBehaviour
     [SyncVar(hook = nameof(OnEquipmentChanged))] public int hairItem;
     [SyncVar(hook = nameof(OnEquipmentChanged))] public int torsoItem;
     [SyncVar(hook = nameof(OnEquipmentChanged))] public int legsItem;
-    [SyncVar(hook = nameof(OnEquipmentChanged))] public int weaponForegroundItem;
-    [SyncVar(hook = nameof(OnEquipmentChanged))] public int weaponBackgroundItem;
 
     [SyncVar(hook = nameof(OnStateChanged))]
     public CharacterState currentState = CharacterState.Idle;
@@ -28,6 +27,7 @@ public class NetworkCharacter : NetworkBehaviour
     private DatabaseReference dbRef;
     private string userId;
     private string characterId;
+    private SceneControllerManager sceneControllerManager;
 
     public override void OnStartClient()
     {
@@ -71,6 +71,20 @@ public class NetworkCharacter : NetworkBehaviour
         CmdSetUserData(userId, characterId);
     }
 
+    [Command]
+    public void CmdSaveLocation(string sceneName)
+    {
+        if (!isServer) return;
+        
+        Dictionary<string, object> updates = new Dictionary<string, object>();
+        
+        updates[$"users/{userId}/characters/{characterId}/location/sceneName"] = sceneName;
+        updates[$"users/{userId}/characters/{characterId}/location/x"] = transform.position.x;
+        updates[$"users/{userId}/characters/{characterId}/location/y"] = transform.position.y;
+        updates[$"users/{userId}/characters/{characterId}/location/z"] = transform.position.z;
+        
+        dbRef.UpdateChildrenAsync(updates);
+    }    
     private IEnumerator SetCameraFollow()
     {
         // Wait until PlayerUIScene is fully loaded
@@ -105,41 +119,67 @@ public class NetworkCharacter : NetworkBehaviour
         LoadCharacterDataFromFirebaseServer();
     }
 
-[Server]
-private void LoadCharacterDataFromFirebaseServer()
-{
-    dbRef.Child("users").Child(userId).Child("characters").Child(characterId).GetValueAsync()
-        .ContinueWithOnMainThread(task =>
-        {
-            if (task.IsFaulted || !task.Result.Exists)
+    [Server]
+    private void LoadCharacterDataFromFirebaseServer()
+    {
+        dbRef.Child("users").Child(userId).Child("characters").Child(characterId).GetValueAsync()
+            .ContinueWithOnMainThread(task =>
             {
-                Debug.LogError("Error retrieving character data from Firebase.");
-                return;
-            }
+                if (task.IsFaulted || !task.Result.Exists)
+                {
+                    Debug.LogError("Error retrieving character data from Firebase.");
+                    return;
+                }
 
-            DataSnapshot snapshot = task.Result;
-            
-            // Read equipment data from new path
-            DataSnapshot equipmentData = snapshot.Child("equipment");
-            
-            // Read equipment values
-            int newHead = int.Parse(equipmentData.Child("head").Value.ToString());
-            int newBody = int.Parse(equipmentData.Child("body").Value.ToString());
-            int newHair = int.Parse(equipmentData.Child("hair").Value.ToString());
-            int newTorso = int.Parse(equipmentData.Child("torso").Value.ToString());
-            int newLegs = int.Parse(equipmentData.Child("legs").Value.ToString());
+                DataSnapshot snapshot = task.Result;
+                
+                // Read equipment data from new path
+                DataSnapshot equipmentData = snapshot.Child("equipment");
+                
+                // Read equipment values
+                int newHead = int.Parse(equipmentData.Child("head").Value.ToString());
+                int newBody = int.Parse(equipmentData.Child("body").Value.ToString());
+                int newHair = int.Parse(equipmentData.Child("hair").Value.ToString());
+                int newTorso = int.Parse(equipmentData.Child("torso").Value.ToString());
+                int newLegs = int.Parse(equipmentData.Child("legs").Value.ToString());
 
 
-            // Set SyncVars on the server so they sync to all clients
-            headItem = newHead;
-            bodyItem = newBody;
-            hairItem = newHair;
-            torsoItem = newTorso;
-            legsItem = newLegs;
+                // Set SyncVars on the server so they sync to all clients
+                headItem = newHead;
+                bodyItem = newBody;
+                hairItem = newHair;
+                torsoItem = newTorso;
+                legsItem = newLegs;
 
-            Debug.Log($"Server updated SyncVars: Head:{headItem}, Body:{bodyItem}, Hair:{hairItem}, Torso:{torsoItem}, Legs:{legsItem}");
-        });
+                Debug.Log($"Server updated SyncVars: Head:{headItem}, Body:{bodyItem}, Hair:{hairItem}, Torso:{torsoItem}, Legs:{legsItem}");
+
+                string currentScene = "Scene_IntroScene"; // Default
+                Vector3 spawnPosition = Vector3.zero;
+                
+                if (snapshot.Child("location").Exists)
+                {
+                    currentScene = snapshot.Child("location").Child("sceneName").Value.ToString();
+                    float x = float.Parse(snapshot.Child("location").Child("x").Value.ToString());
+                    float y = float.Parse(snapshot.Child("location").Child("y").Value.ToString());
+                    float z = float.Parse(snapshot.Child("location").Child("z").Value.ToString());
+                    spawnPosition = new Vector3(x, y, z);
+                }
+                
+                
+                // Load the player's current scene
+                RpcLoadPlayerScene(currentScene, spawnPosition);
+                
+            });
 }
+
+    [ClientRpc]
+    private void RpcLoadPlayerScene(string sceneName, Vector3 spawnPosition)
+    {
+        if (isLocalPlayer && !string.IsNullOrEmpty(sceneName))
+        {
+            StartCoroutine(LoadSceneWithRetry(sceneName, spawnPosition));
+        }
+    }
     [Command]
     public void CmdChangeEquipment(int newHead, int newBody, int newHair, int newTorso, int newLegs)
     {
@@ -169,6 +209,19 @@ private void LoadCharacterDataFromFirebaseServer()
         updates[$"users/{userId}/characters/{characterId}/equipment/legs"] = newLegs;
         
         // Execute all updates atomically
+        dbRef.UpdateChildrenAsync(updates);
+    }
+
+    [Server]
+    public void SaveLocationToFirebase(string sceneName, Vector3 position)
+    {
+        Dictionary<string, object> updates = new Dictionary<string, object>();
+        
+        updates[$"users/{userId}/characters/{characterId}/location/sceneName"] = sceneName;
+        updates[$"users/{userId}/characters/{characterId}/location/x"] = position.x;
+        updates[$"users/{userId}/characters/{characterId}/location/y"] = position.y;
+        updates[$"users/{userId}/characters/{characterId}/location/z"] = position.z;
+        
         dbRef.UpdateChildrenAsync(updates);
     }
 
@@ -225,21 +278,58 @@ private void LoadCharacterDataFromFirebaseServer()
     }
 
     public void ApplyCharacterState(CharacterState state, PlayerFacing direction)
-{
-    if (characterAnimator == null)
     {
-        Debug.LogError("CharacterAnimator component missing!");
-        return;
+        if (characterAnimator == null)
+        {
+            Debug.LogError("CharacterAnimator component missing!");
+            return;
+        }
+
+        switch (state)
+        {
+            case CharacterState.Idle:
+                characterAnimator.PlayIdle(direction);
+                break;
+            case CharacterState.Running:
+                characterAnimator.PlayRun(direction);
+                break;
+        }
     }
 
-    switch (state)
+    
+    private IEnumerator LoadSceneWithRetry(string sceneName, Vector3 spawnPosition)
     {
-        case CharacterState.Idle:
-            characterAnimator.PlayIdle(direction);
-            break;
-        case CharacterState.Running:
-            characterAnimator.PlayRun(direction);
-            break;
+        // Wait a moment for everything to initialize
+        yield return new WaitForSeconds(0.5f);
+        
+        // Try to find the SceneControllerManager multiple times
+        int attempts = 0;
+        SceneControllerManager sceneController = null;
+        
+        while (attempts < 5)
+        {
+            sceneController = SceneControllerManager.Instance;
+            if (sceneController != null)
+            {
+                break;
+            }
+            
+            Debug.Log($"Attempt {attempts+1}: Waiting for SceneControllerManager...");
+            yield return new WaitForSeconds(0.5f);
+            attempts++;
+        }
+        
+        // Use the SceneControllerManager if found
+        if (sceneController != null)
+        {
+            Debug.Log("Using SceneControllerManager to load scene");
+            sceneController.FadeAndLoadScene(sceneName, spawnPosition);
+        }
+        else
+        {
+            Debug.LogError("SceneControllerManager still not found after multiple attempts");
+            // Fallback direct loading
+            SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
+        }
     }
-}
 }

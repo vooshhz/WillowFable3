@@ -48,6 +48,7 @@ public enum GridBoolProperty
 
 public enum SceneName
 {
-    Scene_IntroScene
+    Scene_IntroScene,
+    Scene_FieldScene
 }
 

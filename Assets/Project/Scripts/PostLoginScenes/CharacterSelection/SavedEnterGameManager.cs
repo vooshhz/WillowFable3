@@ -101,8 +101,6 @@ public class SavedEnterGameManager : MonoBehaviour
         ConnectToServer();
     }
 
-
-
     // Handles connecting the client to the server
     private void ConnectToServer()
     {
@@ -126,39 +124,4 @@ public class SavedEnterGameManager : MonoBehaviour
         }
     }
 
-
-
-
-
-    private IEnumerator LoadScenesSequentially()
-    {
-        yield return LoadSceneIfNotLoaded(persistentScene);
-        yield return LoadSceneIfNotLoaded(playerUIScene);
-        yield return LoadSceneIfNotLoaded(introScene);
-    }
-
-    private IEnumerator LoadSceneIfNotLoaded(string scene)
-    {
-        string sceneName = GetSceneName(scene);
-
-        if (!SceneManager.GetSceneByName(sceneName).isLoaded)
-        {
-            Debug.Log($"Loading {sceneName}...");
-            SceneManager.LoadScene(sceneName, LoadSceneMode.Additive);
-
-            while (!SceneManager.GetSceneByName(sceneName).isLoaded)
-            {
-                Debug.Log($"Waiting for {sceneName} to load... Progress: {SceneManager.GetSceneByName(sceneName).isLoaded}");
-                yield return null;
-            }
-
-            Debug.Log($" {sceneName} successfully loaded!");
-        }
-    }
-
-
-    private string GetSceneName(string scene)
-    {
-        return scene != null ? scene : "";
-    }
 }

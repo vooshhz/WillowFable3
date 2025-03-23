@@ -7,10 +7,8 @@ using System.Collections;
 
 public class UIInventorySlot : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
-    private Camera mainCamera;
     private Canvas parentCanvas;
     private Transform parentItem;
-    private GameObject draggedItem;
     public Image inventorySlotHighlight;
     public Image inventorySlotImage;
     public TextMeshProUGUI textMeshProUGUI;
@@ -37,7 +35,6 @@ public class UIInventorySlot : MonoBehaviour, IPointerClickHandler, IPointerEnte
     }
     private void Start() 
     {
-        mainCamera = Camera.main;
         parentItem = GameObject.FindGameObjectWithTag(Tags.ItemsParentTransform).transform;
         StartCoroutine(FindLocalPlayer());
     }

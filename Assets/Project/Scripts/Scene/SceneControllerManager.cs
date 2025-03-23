@@ -27,6 +27,9 @@ public class SceneControllerManager : MonoBehaviour
         
         // Set this as the current instance
         _instance = this;
+
+        // Make sure it persists between scene loads
+        DontDestroyOnLoad(gameObject);
     }
     
     private void OnDestroy()
@@ -89,7 +92,7 @@ public class SceneControllerManager : MonoBehaviour
         yield return StartCoroutine(Fade(0f));
     }
 
-    private IEnumerator LoadSceneAndSetActive(string sceneName)
+    public IEnumerator LoadSceneAndSetActive(string sceneName)
     {
         // Allow the given scene to load over several frames and add it to the already loaded scenes (just the Persistent scene at this point).
         yield return SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
