@@ -1,4 +1,3 @@
-using Firebase.Firestore;
 using UnityEngine;
 
 public class InitializeUI : MonoBehaviour

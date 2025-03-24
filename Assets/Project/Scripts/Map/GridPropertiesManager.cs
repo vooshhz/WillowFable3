@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -26,74 +27,79 @@ public class GridPropertiesManager : MonoBehaviour
         // Set this as the current instance
         _instance = this;
     }
-    private void Start() 
+
+    private void Start()
     {
-        // Find the grid
         grid = GameObject.FindObjectOfType<Grid>();
-        InitialiseGridProperties();   
+        InitialiseGridProperties();
     }
 
-    private void InitialiseGridProperties()
+
+private void InitialiseGridProperties()
+{
+    
+     string activeSceneName = SceneManager.GetActiveScene().name;
+    Debug.Log($"🔍 Active scene: {activeSceneName}");
+
+    foreach (SO_GridProperties so_GridProperties in so_gridPropertiesArray)
     {
-        // Loop through all gridproperties in the array
-        foreach (SO_GridProperties so_GridProperties in so_gridPropertiesArray)
-        {
-            // Create dictionary of grid property details
-            Dictionary<string, GridPropertyDetails> gridPropertyDictionary = new Dictionary<string, GridPropertyDetails>();
+        Debug.Log($"📝 Checking grid properties for: {so_GridProperties.sceneName}");
 
-            // Populate grid property dictionary - Iterate through all the grid properties in the so gridproperties list
-            foreach (GridProperty gridProperty in so_GridProperties.gridPropertyList)
-            {
-                GridPropertyDetails gridPropertyDetails;
+        if (!so_GridProperties.sceneName.ToString().Equals(activeSceneName, StringComparison.OrdinalIgnoreCase))
+            continue;
 
-                gridPropertyDetails = GetGridPropertyDetails(gridProperty.gridCoordinate.x, gridProperty.gridCoordinate.y, gridPropertyDictionary);
-
-                if (gridPropertyDetails == null)
-                {
-                    gridPropertyDetails = new GridPropertyDetails();
-                }
-
-                switch (gridProperty.gridBoolProperty)
-                {
-                    case GridBoolProperty.diggable:
-                        gridPropertyDetails.isDiggable = gridProperty.gridBoolValue;
-                        break;
-
-                    case GridBoolProperty.canDropItem:
-                        gridPropertyDetails.canDropItem = gridProperty.gridBoolValue;
-                        break;
-
-                    case GridBoolProperty.canPlaceFurniture:
-                        gridPropertyDetails.canPlaceFurniture = gridProperty.gridBoolValue;
-                        break;
-
-                    case GridBoolProperty.isPath:
-                        gridPropertyDetails.isPath = gridProperty.gridBoolValue;
-                        break;
-
-                    case GridBoolProperty.isNPCObstacle:
-                        gridPropertyDetails.isNPCObstacle = gridProperty.gridBoolValue;
-                        break;
-
-                    default:
-                        break;
-                }
-
-                SetGridPropertyDetails(gridProperty.gridCoordinate.x, gridProperty.gridCoordinate.y, gridPropertyDetails, gridPropertyDictionary);
-                if (gridPropertyDictionary == null)
-                    {
-                        Debug.LogError($"❌ GridPropertiesManager: No SO_GridProperties matched the active scene '{SceneManager.GetActiveScene().name}'.");
-                    }
-
-            }
-
-            // Always use the grid properties of the currently active scene
-            if (so_GridProperties.sceneName.ToString().Equals(SceneManager.GetActiveScene().name, StringComparison.OrdinalIgnoreCase))
-            {
-                this.gridPropertyDictionary = gridPropertyDictionary;
-            }
-        }
+        Debug.Log($"✅ Loading grid properties for scene: {activeSceneName}");
+        
     }
+
+    foreach (SO_GridProperties so_GridProperties in so_gridPropertiesArray)
+    {
+        if (!activeSceneName.Contains(so_GridProperties.sceneName.ToString(), StringComparison.OrdinalIgnoreCase))
+
+            continue;
+
+        Debug.Log($"✅ Loading grid properties for scene: {activeSceneName}");
+
+        Dictionary<string, GridPropertyDetails> propertyDict = new Dictionary<string, GridPropertyDetails>();
+
+        foreach (GridProperty gridProperty in so_GridProperties.gridPropertyList)
+        {
+            GridPropertyDetails gridPropertyDetails = GetGridPropertyDetails(
+                gridProperty.gridCoordinate.x,
+                gridProperty.gridCoordinate.y,
+                propertyDict);
+
+            if (gridPropertyDetails == null)
+                gridPropertyDetails = new GridPropertyDetails();
+
+            switch (gridProperty.gridBoolProperty)
+            {
+                case GridBoolProperty.diggable:
+                    gridPropertyDetails.isDiggable = gridProperty.gridBoolValue;
+                    break;
+                case GridBoolProperty.canDropItem:
+                    gridPropertyDetails.canDropItem = gridProperty.gridBoolValue;
+                    break;
+                case GridBoolProperty.canPlaceFurniture:
+                    gridPropertyDetails.canPlaceFurniture = gridProperty.gridBoolValue;
+                    break;
+                case GridBoolProperty.isPath:
+                    gridPropertyDetails.isPath = gridProperty.gridBoolValue;
+                    break;
+                case GridBoolProperty.isNPCObstacle:
+                    gridPropertyDetails.isNPCObstacle = gridProperty.gridBoolValue;
+                    break;
+            }
+
+            SetGridPropertyDetails(gridProperty.gridCoordinate.x, gridProperty.gridCoordinate.y, gridPropertyDetails, propertyDict);
+        }
+
+        this.gridPropertyDictionary = propertyDict;
+        return;
+    }
+
+    Debug.LogError($"❌ No matching SO_GridProperties found for active scene: {activeSceneName}");
+}
 
     public GridPropertyDetails GetGridPropertyDetails(int gridX, int gridY, Dictionary<string, GridPropertyDetails> gridPropertyDictionary)
     {
@@ -102,7 +108,11 @@ public class GridPropertiesManager : MonoBehaviour
         GridPropertyDetails gridPropertyDetails;
 
         // Check if grid property details exist for coordinate and retrieve
-
+        if (gridPropertyDictionary == null)
+        {
+            Debug.LogError("gridPropertyDictionary is NULL in GetGridPropertyDetails()");
+            return null;
+        }
         if(!gridPropertyDictionary.TryGetValue(key, out gridPropertyDetails))
         {
             // if not found

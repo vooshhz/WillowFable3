@@ -21,9 +21,9 @@ EditorBuildSettings:
     path: Assets/Project/Scenes/PlayerUIScene.unity
     guid: 10379a65f1e6de047bb5f5e5eca8a4bc
   - enabled: 1
-    path: Assets/Project/Scenes/Scene_IntroScene.unity
+    path: Assets/Project/Scenes/Scene_Intro_Scene.unity
     guid: 19c0f22a8b5827a41a1e34e985bc6674
   - enabled: 1
-    path: Assets/Project/Scenes/Scene_FieldScene.unity
+    path: Assets/Project/Scenes/Scene_Field_Scene.unity
     guid: c24447c024ae541479d57c3d6ed5a3bb
   m_configObjects: {}

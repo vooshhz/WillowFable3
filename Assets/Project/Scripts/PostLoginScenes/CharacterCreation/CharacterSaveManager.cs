@@ -109,7 +109,7 @@ public class CharacterSaveManager : MonoBehaviour
         // Create location data
         Dictionary<string, object> location = new Dictionary<string, object>
         {
-            { "sceneName", "Scene_IntroScene" },
+            { "sceneName", "Scene_Intro_Scene" },
             { "x", 0 },
             { "y", 0 },
             { "z", 0 }
