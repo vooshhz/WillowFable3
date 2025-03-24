@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GridPropertiesManager : MonoBehaviour
 {
@@ -78,11 +80,16 @@ public class GridPropertiesManager : MonoBehaviour
                 }
 
                 SetGridPropertyDetails(gridProperty.gridCoordinate.x, gridProperty.gridCoordinate.y, gridPropertyDetails, gridPropertyDictionary);
+                if (gridPropertyDictionary == null)
+                    {
+                        Debug.LogError($"❌ GridPropertiesManager: No SO_GridProperties matched the active scene '{SceneManager.GetActiveScene().name}'.");
+                    }
+
             }
 
-            if (so_GridProperties.sceneName.ToString() == SceneControllerManager.Instance.startingSceneName.ToString())
+            // Always use the grid properties of the currently active scene
+            if (so_GridProperties.sceneName.ToString().Equals(SceneManager.GetActiveScene().name, StringComparison.OrdinalIgnoreCase))
             {
-            
                 this.gridPropertyDictionary = gridPropertyDictionary;
             }
         }

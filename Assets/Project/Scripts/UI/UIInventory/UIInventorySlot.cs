@@ -189,7 +189,6 @@ public class UIInventorySlot : MonoBehaviour, IPointerClickHandler, IPointerEnte
         // Capture the player's current position once at the beginning
         Vector3 playerPositionAtTimeOfDrop = playerTransform.position;
         
-
         // Calculate start and end positions
         Vector3 dropStartPosition = playerPositionAtTimeOfDrop;
         Vector3 dropEndPosition = playerPositionAtTimeOfDrop + new Vector3(0, 1.8f, 0);

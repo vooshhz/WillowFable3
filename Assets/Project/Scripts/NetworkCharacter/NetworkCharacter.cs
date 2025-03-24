@@ -148,19 +148,15 @@ public class NetworkCharacter : NetworkBehaviour
 
     public void LoadPlayerUI()
     {
-<<<<<<< Updated upstream
-        if (isLocalPlayer)
-        {
-            // Just update position instead of loading scene
-            transform.position = spawnPosition;
-=======
+
         if (!SceneManager.GetSceneByName("PlayerUIScene").isLoaded)
         {
             SceneManager.LoadScene("PlayerUIScene", LoadSceneMode.Additive);
             Debug.Log("✅ Player UI Scene loaded.");
->>>>>>> Stashed changes
+
         }
     }
+   
    
     [Command]
     public void CmdChangeEquipment(int newHead, int newBody, int newHair, int newTorso, int newLegs)
@@ -278,44 +274,7 @@ public class NetworkCharacter : NetworkBehaviour
         }
     }
 
-<<<<<<< Updated upstream
-    
-    // private IEnumerator LoadSceneWithRetry(string sceneName, Vector3 spawnPosition)
-    // {
-    //     // Wait a moment for everything to initialize
-    //     yield return new WaitForSeconds(0.5f);
-        
-    //     // Try to find the SceneControllerManager multiple times
-    //     int attempts = 0;
-    //     SceneControllerManager sceneController = null;
-        
-    //     while (attempts < 5)
-    //     {
-    //         sceneController = SceneControllerManager.Instance;
-    //         if (sceneController != null)
-    //         {
-    //             break;
-    //         }
-            
-    //         Debug.Log($"Attempt {attempts+1}: Waiting for SceneControllerManager...");
-    //         yield return new WaitForSeconds(0.5f);
-    //         attempts++;
-    //     }
-        
-    //     // Use the SceneControllerManager if found
-    //     if (sceneController != null)
-    //     {
-    //         Debug.Log("Using SceneControllerManager to load scene");
-    //         sceneController.FadeAndLoadScene(sceneName, spawnPosition);
-    //     }
-    //     else
-    //     {
-    //         Debug.LogError("SceneControllerManager still not found after multiple attempts");
-    //         // Fallback direct loading
-    //         SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
-    //     }
-    // }
-=======
+
     private IEnumerator LoadSceneAndSpawnPlayer(string sceneName, Vector3 spawnPos)
 {
     if (!SceneManager.GetSceneByName(sceneName).isLoaded)
@@ -336,5 +295,4 @@ public class NetworkCharacter : NetworkBehaviour
     LoadPlayerUI();
 }
 
->>>>>>> Stashed changes
 }

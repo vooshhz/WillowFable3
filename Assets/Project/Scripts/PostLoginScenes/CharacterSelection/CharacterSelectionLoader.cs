@@ -156,15 +156,4 @@ public class CharacterSelectionLoader : MonoBehaviour
         animator.RefreshCurrentFrame();
     }
 
-<<<<<<< Updated upstream
-    private void EnterGame()
-    {
-        if (!string.IsNullOrEmpty(selectedCharacterId))
-        {
-            PlayerPrefs.SetString("SelectedCharacterId", selectedCharacterId);            
-        }
-    }
-=======
-
->>>>>>> Stashed changes
 }

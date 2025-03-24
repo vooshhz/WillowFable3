@@ -6,10 +6,7 @@ public class SavedEnterGameManager : MonoBehaviour
 {
     [SerializeField] private Button enterGameButton; // Assign the Enter Game button in the Inspector
     [SerializeField] private string persistentScene;
-<<<<<<< Updated upstream
-=======
 
->>>>>>> Stashed changes
     private string selectedCharacterId = null;
 
     private void Start()

@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using Mirror;
 
 public class SceneControllerManager : MonoBehaviour
 {
@@ -14,7 +15,6 @@ public class SceneControllerManager : MonoBehaviour
     [SerializeField] private float fadeDuration = 1f;
     [SerializeField] private CanvasGroup faderCanvasGroup = null;
     [SerializeField] private Image faderImage = null;
-    public SceneName startingSceneName;
     private void Awake()
     {
         // If an instance already exists and it's not this one
@@ -70,29 +70,46 @@ public class SceneControllerManager : MonoBehaviour
     }
 
     // This is the coroutine where the 'building blocks' of the script are put together.
-    private IEnumerator FadeAndSwitchScenes(string sceneName, Vector3 spawnPosition)
+ private IEnumerator FadeAndSwitchScenes(string sceneName, Vector3 spawnPosition)
+{
+    yield return StartCoroutine(Fade(1f)); // Fade out
+
+    // 🧼 1. Unload current UI (only if it's loaded)
+    if (SceneManager.GetSceneByName("PlayerUIScene").isLoaded)
     {
-        // Start fading to black and wait for it to finish before continuing.
-        yield return StartCoroutine(Fade(1f));
-
-        // Set player position - Note: You'll need to modify this for your network approach
-        // Instead of using a singleton Player.Instance, you should pass a reference to the player
-        // or use a different method to position the player in a networked context
-        
-        // We'll need to replace this line with your network player positioning approach
-        // Player.Instance.gameObject.transform.position = spawnPosition;
-
-        // Unload the current active scene.
-        yield return SceneManager.UnloadSceneAsync(SceneManager.GetActiveScene().buildIndex);
-
-        // Start loading the given scene and wait for it to finish.
-        yield return StartCoroutine(LoadSceneAndSetActive(sceneName));
-
-        // Start fading back in and wait for it to finish before exiting the function.
-        yield return StartCoroutine(Fade(0f));
+        yield return SceneManager.UnloadSceneAsync("PlayerUIScene");
     }
 
-    public IEnumerator LoadSceneAndSetActive(string sceneName)
+    // 🧼 2. Unload current world scene
+    yield return SceneManager.UnloadSceneAsync(SceneManager.GetActiveScene().buildIndex);
+
+    // 🚚 3. Load target scene
+    yield return StartCoroutine(LoadSceneAndSetActive(sceneName));
+
+    // 🧍 4. Find the local player and move them
+    NetworkCharacter localPlayer = NetworkClient.localPlayer.GetComponent<NetworkCharacter>();
+    if (localPlayer != null)
+    {
+        localPlayer.transform.position = spawnPosition;
+
+        // Optional: move to target scene explicitly
+        Scene targetScene = SceneManager.GetSceneByName(sceneName);
+        SceneManager.MoveGameObjectToScene(localPlayer.gameObject, targetScene);
+    }
+    else
+    {
+        Debug.LogError("Local player not found after scene switch.");
+    }
+
+    // 🖼️ 5. Reload UI scene
+    yield return SceneManager.LoadSceneAsync("PlayerUIScene", LoadSceneMode.Additive);
+
+    // 🌞 6. Fade back in
+    yield return StartCoroutine(Fade(0f));
+}
+
+
+     public IEnumerator LoadSceneAndSetActive(string sceneName)
     {
         // Allow the given scene to load over several frames and add it to the already loaded scenes (just the Persistent scene at this point).
         yield return SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
