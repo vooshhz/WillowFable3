@@ -8,9 +8,6 @@ public class SavedEnterGameManager : MonoBehaviour
 {
     [SerializeField] private Button enterGameButton; // Assign the Enter Game button in the Inspector
     [SerializeField] private string persistentScene;
-    [SerializeField] private string playerUIScene;
-    [SerializeField] private string introScene;
-
     private string selectedCharacterId = null;
 
     private void Start()

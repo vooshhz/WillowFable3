@@ -167,8 +167,7 @@ public class CharacterSelectionLoader : MonoBehaviour
     {
         if (!string.IsNullOrEmpty(selectedCharacterId))
         {
-            PlayerPrefs.SetString("SelectedCharacterId", selectedCharacterId);
-            SceneManager.LoadScene("Scene_IntroScene"); // Replace with actual game scene
+            PlayerPrefs.SetString("SelectedCharacterId", selectedCharacterId);            
         }
     }
 }

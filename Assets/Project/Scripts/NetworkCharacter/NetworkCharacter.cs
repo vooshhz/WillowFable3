@@ -175,9 +175,10 @@ public class NetworkCharacter : NetworkBehaviour
     [ClientRpc]
     private void RpcLoadPlayerScene(string sceneName, Vector3 spawnPosition)
     {
-        if (isLocalPlayer && !string.IsNullOrEmpty(sceneName))
+        if (isLocalPlayer)
         {
-            StartCoroutine(LoadSceneWithRetry(sceneName, spawnPosition));
+            // Just update position instead of loading scene
+            transform.position = spawnPosition;
         }
     }
     [Command]
@@ -297,39 +298,39 @@ public class NetworkCharacter : NetworkBehaviour
     }
 
     
-    private IEnumerator LoadSceneWithRetry(string sceneName, Vector3 spawnPosition)
-    {
-        // Wait a moment for everything to initialize
-        yield return new WaitForSeconds(0.5f);
+    // private IEnumerator LoadSceneWithRetry(string sceneName, Vector3 spawnPosition)
+    // {
+    //     // Wait a moment for everything to initialize
+    //     yield return new WaitForSeconds(0.5f);
         
-        // Try to find the SceneControllerManager multiple times
-        int attempts = 0;
-        SceneControllerManager sceneController = null;
+    //     // Try to find the SceneControllerManager multiple times
+    //     int attempts = 0;
+    //     SceneControllerManager sceneController = null;
         
-        while (attempts < 5)
-        {
-            sceneController = SceneControllerManager.Instance;
-            if (sceneController != null)
-            {
-                break;
-            }
+    //     while (attempts < 5)
+    //     {
+    //         sceneController = SceneControllerManager.Instance;
+    //         if (sceneController != null)
+    //         {
+    //             break;
+    //         }
             
-            Debug.Log($"Attempt {attempts+1}: Waiting for SceneControllerManager...");
-            yield return new WaitForSeconds(0.5f);
-            attempts++;
-        }
+    //         Debug.Log($"Attempt {attempts+1}: Waiting for SceneControllerManager...");
+    //         yield return new WaitForSeconds(0.5f);
+    //         attempts++;
+    //     }
         
-        // Use the SceneControllerManager if found
-        if (sceneController != null)
-        {
-            Debug.Log("Using SceneControllerManager to load scene");
-            sceneController.FadeAndLoadScene(sceneName, spawnPosition);
-        }
-        else
-        {
-            Debug.LogError("SceneControllerManager still not found after multiple attempts");
-            // Fallback direct loading
-            SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
-        }
-    }
+    //     // Use the SceneControllerManager if found
+    //     if (sceneController != null)
+    //     {
+    //         Debug.Log("Using SceneControllerManager to load scene");
+    //         sceneController.FadeAndLoadScene(sceneName, spawnPosition);
+    //     }
+    //     else
+    //     {
+    //         Debug.LogError("SceneControllerManager still not found after multiple attempts");
+    //         // Fallback direct loading
+    //         SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
+    //     }
+    // }
 }

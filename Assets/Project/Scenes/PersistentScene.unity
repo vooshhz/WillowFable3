@@ -230,7 +230,6 @@ MonoBehaviour:
   evaluationMethod: 0
   evaluationInterval: 3
   timeInterpolationGui: 0
-  playerSpawnScene: Scene_IntroScene
 --- !u!114 &850949585
 MonoBehaviour:
   m_ObjectHideFlags: 0
