@@ -146,17 +146,22 @@ public class NetworkCharacter : NetworkBehaviour
             });
     }
 
-    public void LoadPlayerUI()
+ private void LoadPlayerUI()
+{
+    StartCoroutine(LoadUIAndInitGrid());
+}
+
+private IEnumerator LoadUIAndInitGrid()
+{
+    if (!SceneManager.GetSceneByName("PlayerUIScene").isLoaded)
     {
-
-        if (!SceneManager.GetSceneByName("PlayerUIScene").isLoaded)
-        {
-            SceneManager.LoadScene("PlayerUIScene", LoadSceneMode.Additive);
-            Debug.Log("✅ Player UI Scene loaded.");
-
-        }
+        AsyncOperation loadOp = SceneManager.LoadSceneAsync("PlayerUIScene", LoadSceneMode.Additive);
+        while (!loadOp.isDone) yield return null;
     }
-   
+
+    // Delay to ensure GridPropertiesManager has run Awake/Start
+    yield return null;
+}
    
     [Command]
     public void CmdChangeEquipment(int newHead, int newBody, int newHair, int newTorso, int newLegs)
@@ -288,6 +293,10 @@ public class NetworkCharacter : NetworkBehaviour
     player.transform.position = spawnPos;
 
     Scene targetScene = SceneManager.GetSceneByName(sceneName);
+
+    // 👉 Set the active scene so other systems use it
+    SceneManager.SetActiveScene(targetScene);
+
     SceneManager.MoveGameObjectToScene(player, targetScene);
 
     Debug.Log($"Spawned player in {sceneName} at {spawnPos}");

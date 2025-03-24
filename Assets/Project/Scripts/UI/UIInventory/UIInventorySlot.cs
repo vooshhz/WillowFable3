@@ -171,6 +171,17 @@ public class UIInventorySlot : MonoBehaviour, IPointerClickHandler, IPointerEnte
 
     private void DropSelectedItemAtPlayerPosition()
     {
+        if (GridPropertiesManager.Instance == null)
+        {
+            Debug.LogError("GridPropertiesManager.Instance is NULL");
+            return;
+        }
+
+        if (GridPropertiesManager.Instance.grid == null)
+        {
+            Debug.LogError("Grid is NULL on GridPropertiesManager");
+            return;
+        }
         if (itemDetails == null || !itemDetails.canBeDropped) return;
         
         // Check if player transform exists

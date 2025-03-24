@@ -27,9 +27,6 @@ public class SceneControllerManager : MonoBehaviour
         
         // Set this as the current instance
         _instance = this;
-
-        // Make sure it persists between scene loads
-        DontDestroyOnLoad(gameObject);
     }
     
     private void OnDestroy()
