@@ -1114,7 +1114,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 414964536}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1229728056}
+        m_TargetAssemblyTypeName: SavedEnterGameManager, Assembly-CSharp
+        m_MethodName: EnterGame
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &414964536
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1200,7 +1212,6 @@ MonoBehaviour:
   levelText3: {fileID: 966574717}
   characterAnimator3: {fileID: 6719592843392139779}
   panelImage3: {fileID: 1589775787}
-  enterGameButton: {fileID: 414964535}
 --- !u!4 &420272758
 Transform:
   m_ObjectHideFlags: 0
@@ -1943,7 +1954,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1229728055}
-  - component: {fileID: 1229728054}
+  - component: {fileID: 1229728056}
   m_Layer: 0
   m_Name: EnterWorldManager
   m_TagString: Untagged
@@ -1951,22 +1962,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1229728054
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1229728053}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4b586e5db1e18164eaddd09ef9b4973a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  enterGameButton: {fileID: 414964535}
-  persistentScene: PersistentScene
-  playerUIScene: PlayerUIScene
-  introScene: Scene_Login
 --- !u!4 &1229728055
 Transform:
   m_ObjectHideFlags: 0
@@ -1982,6 +1977,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1229728056
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1229728053}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43f4ff02cafcf954e87c9fc3a9659607, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enterGameButton: {fileID: 414964535}
+  persistentScene: PersistentScene
 --- !u!1 &1286260118
 GameObject:
   m_ObjectHideFlags: 0
@@ -3485,7 +3494,7 @@ SortingGroup:
   m_GameObject: {fileID: 8683560629470990679}
   m_Enabled: 1
   m_SortingLayerID: -456135545
-  m_SortingLayer: 1
+  m_SortingLayer: 6
   m_SortingOrder: 0
   m_SortAtRoot: 0
 --- !u!212 &1941918466863796497
@@ -3581,7 +3590,7 @@ SortingGroup:
   m_GameObject: {fileID: 5090878727491618178}
   m_Enabled: 1
   m_SortingLayerID: -456135545
-  m_SortingLayer: 1
+  m_SortingLayer: 6
   m_SortingOrder: 0
   m_SortAtRoot: 0
 --- !u!212 &2017343503721044074
@@ -4812,7 +4821,7 @@ SortingGroup:
   m_GameObject: {fileID: 4825869237464635142}
   m_Enabled: 1
   m_SortingLayerID: -456135545
-  m_SortingLayer: 1
+  m_SortingLayer: 6
   m_SortingOrder: 0
   m_SortAtRoot: 0
 --- !u!1 &7581109868312310571

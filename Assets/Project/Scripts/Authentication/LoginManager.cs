@@ -13,7 +13,6 @@ public class LoginManager : MonoBehaviour
     public TMP_InputField passwordInput;
     public Button loginButton;
     public TMP_Text messageText;
-
     private FirebaseAuth auth;
     private FirebaseUser user;
 

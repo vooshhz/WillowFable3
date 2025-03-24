@@ -80,9 +80,9 @@ public class GridPropertiesManager : MonoBehaviour
                 SetGridPropertyDetails(gridProperty.gridCoordinate.x, gridProperty.gridCoordinate.y, gridPropertyDetails, gridPropertyDictionary);
             }
 
-            // If starting scene set the gridPropertyDictionary member variable to the current iteration
             if (so_GridProperties.sceneName.ToString() == SceneControllerManager.Instance.startingSceneName.ToString())
             {
+            
                 this.gridPropertyDictionary = gridPropertyDictionary;
             }
         }

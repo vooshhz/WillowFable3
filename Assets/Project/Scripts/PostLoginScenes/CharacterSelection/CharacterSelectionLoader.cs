@@ -3,7 +3,6 @@ using Firebase.Database;
 using Firebase.Auth;
 using TMPro;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 using Firebase.Extensions;
 
 
@@ -30,7 +29,6 @@ public class CharacterSelectionLoader : MonoBehaviour
     public Image panelImage3;
 
     [Header("Enter Game Button")]
-    public Button enterGameButton; // Assign in Inspector
 
     private string selectedCharacterId = null;
     private Image selectedPanelImage = null;
@@ -41,16 +39,12 @@ public class CharacterSelectionLoader : MonoBehaviour
         characterPanel1.SetActive(false);
         characterPanel2.SetActive(false);
         characterPanel3.SetActive(false);
-
-        // Ensure Enter Game button starts hidden
-        enterGameButton.gameObject.SetActive(false);
     }
 
     private void Start()
     {
         dbReference = FirebaseDatabase.GetInstance("https://willowfable3-default-rtdb.firebaseio.com/").RootReference;
         LoadCharacterData();
-        enterGameButton.onClick.AddListener(EnterGame);
     }
     private void LoadCharacterData()
     {
@@ -134,7 +128,7 @@ public class CharacterSelectionLoader : MonoBehaviour
         selectedCharacterId = charId;
 
         //  Pass selected character to EnterGameManager
-        FindObjectOfType<EnterGameManager>().SetSelectedCharacter(charId);
+        FindObjectOfType<SavedEnterGameManager>().SetSelectedCharacter(charId);
 
         if (selectedPanelImage != null)
         {
@@ -144,7 +138,6 @@ public class CharacterSelectionLoader : MonoBehaviour
         panelImage.color = Color.green;
         selectedPanelImage = panelImage;
     }
-
 
     private void ApplyEquipmentToCharacter(CharacterAnimator animator, int head, int body, int hair, int torso, int legs)
     {
@@ -163,6 +156,7 @@ public class CharacterSelectionLoader : MonoBehaviour
         animator.RefreshCurrentFrame();
     }
 
+<<<<<<< Updated upstream
     private void EnterGame()
     {
         if (!string.IsNullOrEmpty(selectedCharacterId))
@@ -170,4 +164,7 @@ public class CharacterSelectionLoader : MonoBehaviour
             PlayerPrefs.SetString("SelectedCharacterId", selectedCharacterId);            
         }
     }
+=======
+
+>>>>>>> Stashed changes
 }

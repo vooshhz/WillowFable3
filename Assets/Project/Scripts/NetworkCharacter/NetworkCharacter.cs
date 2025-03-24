@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 using Cinemachine;
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
+
 
 public class NetworkCharacter : NetworkBehaviour
 {
@@ -47,12 +47,6 @@ public class NetworkCharacter : NetworkBehaviour
     {
         base.OnStartLocalPlayer();
         Debug.Log($"Local player started with netId {netId}");
-
-        // Load PlayerUIScene additively (only for this player)
-        if (!SceneManager.GetSceneByName("PlayerUIScene").isLoaded)
-        {
-            SceneManager.LoadScene("PlayerUIScene", LoadSceneMode.Additive);
-        }
 
         // Start coroutine to set up Cinemachine Camera
         StartCoroutine(SetCameraFollow());
@@ -132,55 +126,42 @@ public class NetworkCharacter : NetworkBehaviour
                 }
 
                 DataSnapshot snapshot = task.Result;
-                
-                // Read equipment data from new path
                 DataSnapshot equipmentData = snapshot.Child("equipment");
-                
-                // Read equipment values
-                int newHead = int.Parse(equipmentData.Child("head").Value.ToString());
-                int newBody = int.Parse(equipmentData.Child("body").Value.ToString());
-                int newHair = int.Parse(equipmentData.Child("hair").Value.ToString());
-                int newTorso = int.Parse(equipmentData.Child("torso").Value.ToString());
-                int newLegs = int.Parse(equipmentData.Child("legs").Value.ToString());
 
+                // Read equipment
+                headItem = int.Parse(equipmentData.Child("head").Value.ToString());
+                bodyItem = int.Parse(equipmentData.Child("body").Value.ToString());
+                hairItem = int.Parse(equipmentData.Child("hair").Value.ToString());
+                torsoItem = int.Parse(equipmentData.Child("torso").Value.ToString());
+                legsItem = int.Parse(equipmentData.Child("legs").Value.ToString());
 
-                // Set SyncVars on the server so they sync to all clients
-                headItem = newHead;
-                bodyItem = newBody;
-                hairItem = newHair;
-                torsoItem = newTorso;
-                legsItem = newLegs;
+                // Read scene + position
+                string sceneName = snapshot.Child("location").Child("sceneName").Value.ToString();
+                float x = float.Parse(snapshot.Child("location").Child("x").Value.ToString());
+                float y = float.Parse(snapshot.Child("location").Child("y").Value.ToString());
+                float z = float.Parse(snapshot.Child("location").Child("z").Value.ToString());
+                Vector3 spawnPos = new Vector3(x, y, z);
 
-                Debug.Log($"Server updated SyncVars: Head:{headItem}, Body:{bodyItem}, Hair:{hairItem}, Torso:{torsoItem}, Legs:{legsItem}");
-
-                string currentScene = "Scene_IntroScene"; // Default
-                Vector3 spawnPosition = Vector3.zero;
-                
-                if (snapshot.Child("location").Exists)
-                {
-                    currentScene = snapshot.Child("location").Child("sceneName").Value.ToString();
-                    float x = float.Parse(snapshot.Child("location").Child("x").Value.ToString());
-                    float y = float.Parse(snapshot.Child("location").Child("y").Value.ToString());
-                    float z = float.Parse(snapshot.Child("location").Child("z").Value.ToString());
-                    spawnPosition = new Vector3(x, y, z);
-                }
-                
-                
-                // Load the player's current scene
-                RpcLoadPlayerScene(currentScene, spawnPosition);
-                
+                StartCoroutine(LoadSceneAndSpawnPlayer(sceneName, spawnPos));                
             });
-}
+    }
 
-    [ClientRpc]
-    private void RpcLoadPlayerScene(string sceneName, Vector3 spawnPosition)
+    public void LoadPlayerUI()
     {
+<<<<<<< Updated upstream
         if (isLocalPlayer)
         {
             // Just update position instead of loading scene
             transform.position = spawnPosition;
+=======
+        if (!SceneManager.GetSceneByName("PlayerUIScene").isLoaded)
+        {
+            SceneManager.LoadScene("PlayerUIScene", LoadSceneMode.Additive);
+            Debug.Log("✅ Player UI Scene loaded.");
+>>>>>>> Stashed changes
         }
     }
+   
     [Command]
     public void CmdChangeEquipment(int newHead, int newBody, int newHair, int newTorso, int newLegs)
     {
@@ -297,6 +278,7 @@ public class NetworkCharacter : NetworkBehaviour
         }
     }
 
+<<<<<<< Updated upstream
     
     // private IEnumerator LoadSceneWithRetry(string sceneName, Vector3 spawnPosition)
     // {
@@ -333,4 +315,26 @@ public class NetworkCharacter : NetworkBehaviour
     //         SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
     //     }
     // }
+=======
+    private IEnumerator LoadSceneAndSpawnPlayer(string sceneName, Vector3 spawnPos)
+{
+    if (!SceneManager.GetSceneByName(sceneName).isLoaded)
+    {
+        AsyncOperation loadOp = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
+        while (!loadOp.isDone) yield return null;
+    }
+
+    // Move this player to the correct scene
+    GameObject player = gameObject; // This player object
+    player.transform.position = spawnPos;
+
+    Scene targetScene = SceneManager.GetSceneByName(sceneName);
+    SceneManager.MoveGameObjectToScene(player, targetScene);
+
+    Debug.Log($"Spawned player in {sceneName} at {spawnPos}");
+
+    LoadPlayerUI();
+}
+
+>>>>>>> Stashed changes
 }

@@ -52,6 +52,7 @@ using Firebase.Database;
 
 public class CustomNetworkManager : NetworkManager
 {
+<<<<<<< Updated upstream
     private DatabaseReference dbRef;
     
     public override void Awake()
@@ -139,5 +140,15 @@ public class CustomNetworkManager : NetworkManager
     {
         // For now, we use the static PlayerPrefs approach
         return PlayerPrefs.GetString("SelectedCharacterId", null);
+=======
+    public override void OnServerAddPlayer(NetworkConnectionToClient conn)
+    {
+        // Just spawn the player, don't move or load scenes here
+        GameObject player = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
+        NetworkServer.AddPlayerForConnection(conn, player);
+        
+        Debug.Log("[Server] Player prefab instantiated and assigned to connection.");
+>>>>>>> Stashed changes
     }
+
 }

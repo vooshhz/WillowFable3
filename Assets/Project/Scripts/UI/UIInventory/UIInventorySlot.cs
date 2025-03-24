@@ -35,7 +35,7 @@ public class UIInventorySlot : MonoBehaviour, IPointerClickHandler, IPointerEnte
     }
     private void Start() 
     {
-        parentItem = GameObject.FindGameObjectWithTag(Tags.ItemsParentTransform).transform;
+        StartCoroutine(TryFindParentItem());
         StartCoroutine(FindLocalPlayer());
     }
 
@@ -59,6 +59,30 @@ public class UIInventorySlot : MonoBehaviour, IPointerClickHandler, IPointerEnte
         }
     }
 
+    private IEnumerator TryFindParentItem(float timeout = 5f)
+    {
+        float timer = 0f;
+
+        while (parentItem == null && timer < timeout)
+        {
+            GameObject found = GameObject.FindGameObjectWithTag(Tags.ItemsParentTransform);
+
+            if (found != null)
+            {
+                parentItem = found.transform;
+                Debug.Log("✅ Found ItemsParentTransform.");
+                yield break;
+            }
+
+            timer += Time.deltaTime;
+            yield return null;
+        }
+
+        if (parentItem == null)
+        {
+            Debug.LogWarning("⚠️ Failed to find ItemsParentTransform within timeout.");
+        }
+    }
      public void OnPointerClick(PointerEventData eventData)
     {
         // If there's already a selected slot and it's not this one, perform swap

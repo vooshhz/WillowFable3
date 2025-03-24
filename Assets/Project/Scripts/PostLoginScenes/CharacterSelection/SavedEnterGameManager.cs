@@ -1,21 +1,20 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
-using System.Collections;
-using Mirror;
 
 public class SavedEnterGameManager : MonoBehaviour
 {
     [SerializeField] private Button enterGameButton; // Assign the Enter Game button in the Inspector
     [SerializeField] private string persistentScene;
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
     private string selectedCharacterId = null;
 
     private void Start()
     {
-        // Ensure the button is initially hidden
-        enterGameButton.gameObject.SetActive(false);
-
-        // Attach click event listener
+        enterGameButton.gameObject.SetActive(false); // Hide initially
         enterGameButton.onClick.AddListener(EnterGame);
     }
 
@@ -24,11 +23,11 @@ public class SavedEnterGameManager : MonoBehaviour
         if (!string.IsNullOrEmpty(characterId))
         {
             selectedCharacterId = characterId;
-            enterGameButton.gameObject.SetActive(true); // Show button when character is selected
+            enterGameButton.gameObject.SetActive(true);
         }
     }
 
-    private void EnterGame()
+    public void EnterGame()
     {
         if (enterGameButton == null)
         {
@@ -45,80 +44,10 @@ public class SavedEnterGameManager : MonoBehaviour
         PlayerPrefs.SetString("SelectedCharacterId", selectedCharacterId);
         PlayerPrefs.Save();
 
-        // Ensure PersistentScene is loaded before connecting
-        if (!SceneManager.GetSceneByName("PersistentScene").isLoaded)
+        if (!SceneManager.GetSceneByName(persistentScene).isLoaded)
         {
             Debug.Log("PersistentScene is not loaded. Loading it now...");
-            StartCoroutine(LoadPersistentSceneBeforeConnecting());
-            return; // Stop execution here, let the coroutine handle the connection
-        }
-
-        // Now connect to the server
-        ConnectToServer();
-    }
-
-    // Coroutine to wait until PersistentScene is loaded
-    private IEnumerator LoadPersistentSceneBeforeConnecting()
-    {
-        // Check if PersistentScene is already loaded
-        if (SceneManager.GetSceneByName("PersistentScene").isLoaded)
-        {
-            Debug.Log("PersistentScene is already loaded. Skipping load...");
-            ConnectToServer(); // Move to the next step
-            yield break;
-        }
-
-        Debug.Log("Loading PersistentScene...");
-        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync("PersistentScene", LoadSceneMode.Additive);
-
-        // Ensure the scene starts loading
-        if (asyncLoad == null)
-        {
-            Debug.LogError("Failed to start loading PersistentScene!");
-            yield break;
-        }
-
-        // Wait until the scene is fully loaded
-        while (!asyncLoad.isDone)
-        {
-            Debug.Log($"Waiting for PersistentScene to load... Progress: {asyncLoad.progress}");
-            yield return null;
-        }
-
-        Debug.Log("PersistentScene loaded successfully!");
-
-        // Ensure NetworkManager exists before proceeding
-        while (NetworkManager.singleton == null)
-        {
-            Debug.Log("Waiting for NetworkManager to initialize...");
-            yield return null;
-        }
-
-        Debug.Log("NetworkManager found! Connecting to server...");
-        ConnectToServer();
-    }
-
-    // Handles connecting the client to the server
-    private void ConnectToServer()
-    {
-        if (NetworkManager.singleton == null)
-        {
-            Debug.LogError("NetworkManager singleton is null! Make sure NetworkManager exists in the scene.");
-            return;
-        }
-
-        // Ensure the client connects to the correct EC2 IP address
-        NetworkManager.singleton.networkAddress = "44.202.86.167"; // EC2 Server IP
-
-        if (!NetworkClient.isConnected)
-        {
-            Debug.Log("Attempting to connect to the dedicated server at " + NetworkManager.singleton.networkAddress);
-            NetworkManager.singleton.StartClient();
-        }
-        else
-        {
-            Debug.Log("Already connected to the server.");
+            SceneManager.LoadScene(persistentScene);
         }
     }
-
 }
