@@ -7,58 +7,72 @@ using Firebase.Extensions;
 using UnityEngine.SceneManagement;
 using System.Collections;
 
+// Login Manager handles Firebase login for users in Unity
 public class LoginManager : MonoBehaviour
 {
     public TMP_InputField emailInput;
     public TMP_InputField passwordInput;
     public Button loginButton;
     public TMP_Text messageText;
-    private FirebaseAuth auth;
-    private FirebaseUser user;
+    private FirebaseAuth auth; // Singleton Firebase authentication instance, FirebaseAuth handles all Firebase Authentication - login, register, logout, password reset, etc
+    private FirebaseUser user; // Currently logged-in Firebase user, holds task.Result.User to give object Email, UserId (Firebase UID) and auth tokens
 
     private void Start()
-    {
+    {   
+        // Check and fix Firebase dependencies asynchronously
         FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task =>
         {
+            // If all dependencies are available
             if (task.Result == DependencyStatus.Available)
-            {
+            {   
+                // Get the default Firebase app instance
                 FirebaseApp app = FirebaseApp.DefaultInstance;
 
-                // Set the Database URL here
+                // Set the Realtime Database URL (not required for Auth, but may be for future DB use)
                 app.Options.DatabaseUrl = new System.Uri("https://willowfable3-default-rtdb.firebaseio.com/");
-
+                
+                // Log Firebase project details to console (helpful for debugging)
                 Debug.Log("Firebase Project ID: " + app.Options.ProjectId);
                 Debug.Log("Firebase Database URL: " + app.Options.DatabaseUrl);
                 Debug.Log("Firebase API Key: " + app.Options.ApiKey);
                 Debug.Log("Firebase App ID: " + app.Options.AppId);
 
+                // Assign the FirebaseAuth instance
                 auth = FirebaseAuth.DefaultInstance;
+                // Notify user Firebase initialized
                 messageText.text = "Firebase Initialized";
                 Debug.Log("Authentication connected to Firebase.");
             }
             else
             {
+                // Notify user that Firebase failed to initialize
                 messageText.text = "Firebase failed to initialize: " + task.Result.ToString();
                 Debug.LogError("Firebase failed to initialize: " + task.Result.ToString());
             }
         });
 
+        // Assign the login button's onClick listener to trigger login
         loginButton.onClick.AddListener(LoginUser);
     }
 
+    // Called when login button is clicked
     public void LoginUser()
     {
+        // Get email and password input
         string email = emailInput.text;
         string password = passwordInput.text;
 
+        // Check if either field is empty
         if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
         {
             messageText.text = "Email and password cannot be empty.";
             return;
         }
 
+        // Call Firebase to sign in using email and password
         auth.SignInWithEmailAndPasswordAsync(email, password).ContinueWithOnMainThread(task =>
         {
+            // Handle canceled login
             if (task.IsCanceled)
             {
                 messageText.text = "Login canceled.";
@@ -66,14 +80,19 @@ public class LoginManager : MonoBehaviour
                 return;
             }
 
+            // Handle errors
             if (task.IsFaulted)
             {
+                // Extract FirebaseException if present
                 FirebaseException firebaseEx = task.Exception?.Flatten().InnerExceptions[0] as FirebaseException;
+                // Get the AuthError code
                 AuthError errorCode = firebaseEx != null ? (AuthError)firebaseEx.ErrorCode : AuthError.None;
 
+                // Log error details
                 Debug.LogError($"Login Failed: {firebaseEx?.Message}");
                 Debug.LogError($"Firebase Error Code: {errorCode}");
-
+                
+                // Display error message based on the error code
                 switch (errorCode)
                 {
                     case AuthError.MissingEmail:
@@ -105,7 +124,7 @@ public class LoginManager : MonoBehaviour
                 return;
             }
 
-            // Success
+            // If login is successful
             user = task.Result.User;
             messageText.text = "Login successful! Welcome back, " + user.Email;
             Debug.Log("Login successful: " + user.Email);
@@ -115,10 +134,11 @@ public class LoginManager : MonoBehaviour
         });
     }
 
+    // Coroutine to load character selection scene after a delay
     private IEnumerator LoadCharacterSelectionScene()
     {
-        yield return new WaitForSeconds(1f);
-        SceneManager.LoadScene("Scene_CharacterSelection");
+        yield return new WaitForSeconds(1f); // wait for 1 second
+        SceneManager.LoadScene("Scene_CharacterSelection"); // load next scene
     }
 
 

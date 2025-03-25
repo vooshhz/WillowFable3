@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public class CharacterAnimator : MonoBehaviour
 {
-    // Body parts renderers
+    // Sprites for each body part
     public SpriteRenderer headRenderer;
     public SpriteRenderer bodyRenderer;
     public SpriteRenderer hairRenderer;
@@ -11,14 +11,14 @@ public class CharacterAnimator : MonoBehaviour
     public SpriteRenderer legsRenderer;
 
 
-    // Data sources
+    // Equipment data for different parts
     public EquipmentData headData;
     public EquipmentData bodyData;
     public EquipmentData hairData;
     public EquipmentData torsoData;
     public EquipmentData legsData;
 
-    // Equipped items
+    // Currently equipped item numbers (used to identify the correct sprite set)
     public int headItemNumber = 20001;
     public int bodyItemNumber = 10001;
     public int hairItemNumber = 30001;
@@ -110,9 +110,7 @@ public class CharacterAnimator : MonoBehaviour
         UpdateAnimation();
     }
 
-    /// <summary>
     /// Applies character state from NetworkCharacter.
-    /// </summary>
     public void ApplyCharacterState(CharacterState state, PlayerFacing direction)
     {
         if (state == CharacterState.Running)
@@ -125,25 +123,19 @@ public class CharacterAnimator : MonoBehaviour
         }
     }
 
-    /// <summary>
     /// Plays an idle animation based on facing direction.
-    /// </summary>
     public void PlayIdle(PlayerFacing facing)
     {
         PlayAnimation($"idle_{facing.ToString().ToLower()}", true);
     }
 
-    /// <summary>
     /// Plays a run animation based on facing direction.
-    /// </summary>
     public void PlayRun(PlayerFacing facing)
     {
         PlayAnimation($"run_{facing.ToString().ToLower()}", true);
     }
 
-    /// <summary>
     /// Core function to play an animation by name.
-    /// </summary>
     public void PlayAnimation(string animationName, bool looping)
     {
         // Prevent restarting the same animation
@@ -191,9 +183,7 @@ public class CharacterAnimator : MonoBehaviour
         }
     }
 
-    /// <summary>
     /// Sets the correct frame for each body part.
-    /// </summary>
     public void SetFrame(int frameIndex)
     {
         currentFrame = frameIndex;
@@ -214,9 +204,7 @@ public class CharacterAnimator : MonoBehaviour
             legsRenderer.sprite = GetSpriteFromItem(legsData, legsItemNumber, frameIndex);
     }
 
-    /// <summary>
     /// Fetches the correct sprite for an equipment item.
-    /// </summary>
     private Sprite GetSpriteFromItem(EquipmentData data, int itemNumber, int frameIndex)
     {
         foreach (var item in data.equipmentItems)
@@ -234,9 +222,7 @@ public class CharacterAnimator : MonoBehaviour
         return null;
     }
 
-    /// <summary>
     /// Refreshes the character's current animation frame.
-    /// </summary>
     public void RefreshCurrentFrame()
     {
         SetFrame(currentFrame);

@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
-public class SavedEnterGameManager : MonoBehaviour
+public class EnterGameManager : MonoBehaviour
 {
     [SerializeField] private Button enterGameButton; // Assign the Enter Game button in the Inspector
     [SerializeField] private string persistentScene;
