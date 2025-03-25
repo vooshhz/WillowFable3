@@ -9,49 +9,57 @@ using System.Collections.Generic;
 
 public class CharacterSaveManager : MonoBehaviour
 {
-    public CharacterAnimator characterAnimator;
-    public ClassSelectionManager classSelectionManager;
-    public TMP_InputField characterNameInput;
-    public TMP_Text errorMessageText;
+    public CharacterAnimator characterAnimator; // reference the animator component 
+    public ClassSelectionManager classSelectionManager; // reference the class selection manager 
+    public TMP_InputField characterNameInput; // reference the character name input
+    public TMP_Text errorMessageText; // reference the message
 
-    private DatabaseReference dbReference;
+    private DatabaseReference dbReference; // reference to the firebase database 
 
     private void Start()
     {
+        // Initialize the Firebase database reference
         dbReference = FirebaseDatabase.GetInstance("https://willowfable3-default-rtdb.firebaseio.com/").RootReference;
     }
 
+    // Called when the player tries to save a new character
     public void SaveCharacterData()
     {
-    FirebaseUser user = FirebaseAuth.DefaultInstance.CurrentUser;
+        // Get the currently logged-in Firebase user
+        FirebaseUser user = FirebaseAuth.DefaultInstance.CurrentUser;
+        
+        // If the read operation failed, log the error and exit
+        if (user == null)
+            {
+                Debug.LogError("User is not logged in.");
+                return;
+            }
 
-    if (user == null)
-    {
-        Debug.LogError("User is not logged in.");
-        return;
-    }
 
-    string userId = user.UserId;
-    string characterName = characterNameInput.text;
+    string userId = user.UserId; // Get the unique ID of the currently logged-in Firebase user
+    string characterName = characterNameInput.text; // Get the character name entered by the user in the input field
 
-    // Check if a character with the same name already exists
+    // Check if the user already has characters (or same name exists)
     dbReference.Child("users").Child(userId).Child("characters")
         .GetValueAsync().ContinueWithOnMainThread(task =>
         {
+            // If the read operation failed, log the error and exit
             if (task.IsFaulted)
             {
                 Debug.LogError("Failed to check existing characters: " + task.Exception);
                 return;
             }
-
+            
+            // If the read operation completed successfully
             if (task.IsCompleted)
             {
-                DataSnapshot snapshot = task.Result;
+                DataSnapshot snapshot = task.Result; // Snapshot of all user's characters
                 
                 // Count characters
-                int characterCount = 0;
-                bool nameExists = false;
+                int characterCount = 0; // Track number of valid characters
+                bool nameExists = false; // Track if this name is already taken
 
+                // Only count valid character entries (must have core data sections)
                 foreach (DataSnapshot characterSnapshot in snapshot.Children)
                 {
                     // Check if this is a valid character node
@@ -59,11 +67,12 @@ public class CharacterSaveManager : MonoBehaviour
                         characterSnapshot.HasChild("equipment") && 
                         characterSnapshot.HasChild("inventory"))
                     {
-                        characterCount++;
+                        characterCount++; //Count this as one valid character
 
-                        // Check for existing name in the info node
+                        // Get the existing character's name from the snapshot
                         string existingName = characterSnapshot.Child("info").Child("characterName").Value?.ToString();
 
+                        // Check if the name already exists (case-sensitive)
                         if (existingName == characterName)
                         {
                             nameExists = true;
@@ -71,14 +80,15 @@ public class CharacterSaveManager : MonoBehaviour
                     }
                 }
 
-                // Check character limit
+                // Enforce a maximum of 3 characters per user
                 if (characterCount >= 3)
                 {
                     Debug.LogWarning("Maximum character limit reached.");
                     errorMessageText.text = "Maximum of 3 characters allowed.";
                     return;
                 }
-
+                
+                // Show an error if a character with the same name exists
                 if (nameExists)
                 {
                     Debug.LogWarning("Character name already exists. Choose a different name.");
@@ -86,6 +96,7 @@ public class CharacterSaveManager : MonoBehaviour
                 }
                 else
                 {
+                    // If all checks pass, proceed to create and save the new character
                     CreateNewCharacter(userId, characterName);
                 }
             }
@@ -93,10 +104,10 @@ public class CharacterSaveManager : MonoBehaviour
     }
     private void CreateNewCharacter(string userId, string characterName)
     {
-        // Create character key first
+        // Generate a unique key for this new character under the user's "characters" node
         string characterKey = dbReference.Child("users").Child(userId).Child("characters").Push().Key;
         
-        // Create info data
+        // Define the base character info (class, name, level, XP, and timestamp)
         Dictionary<string, object> characterInfo = new Dictionary<string, object>
         {
             { "characterName", characterName },
@@ -106,7 +117,7 @@ public class CharacterSaveManager : MonoBehaviour
             { "createdAt", ServerValue.Timestamp }
         };
 
-        // Create location data
+        // Define the starting scene and coordinates (used for spawning the character)
         Dictionary<string, object> location = new Dictionary<string, object>
         {
             { "sceneName", "Scene_Intro_Scene" },
@@ -115,7 +126,7 @@ public class CharacterSaveManager : MonoBehaviour
             { "z", 0 }
         };
         
-        // Create equipment data
+        // Define the equipped item numbers for each body part (from the animator)
         Dictionary<string, object> characterEquipment = new Dictionary<string, object>
         {
             { "head", characterAnimator.headItemNumber },
@@ -125,14 +136,14 @@ public class CharacterSaveManager : MonoBehaviour
             { "legs", characterAnimator.legsItemNumber }
         };
         
-        // Create empty inventory structure
+        // Define the inventory with initial capacity (no items yet)
         Dictionary<string, object> characterInventory = new Dictionary<string, object>
         {
             { "capacity", Settings.playerInitialInventoryCapacity }
         };
 
         
-        // Create updates for all paths
+        // Batch together all updates to write to Firebase in one atomic operation
         Dictionary<string, object> updates = new Dictionary<string, object>();
         updates["users/" + userId + "/characters/" + characterKey + "/info"] = characterInfo;
         updates["users/" + userId + "/characters/" + characterKey + "/equipment"] = characterEquipment;
@@ -141,18 +152,22 @@ public class CharacterSaveManager : MonoBehaviour
 
 
         
-        // Execute all updates atomically
+        // Push all updates to Firebase
         dbReference.UpdateChildrenAsync(updates)
             .ContinueWithOnMainThread(task =>
             {
                 if (task.IsCompleted)
                 {
+                    // Successfully saved all character data
                     Debug.Log("Character saved successfully!");
                     errorMessageText.text = "Character saved successfully!";
+                    
+                    // Wait a second and return to character selection screen
                     StartCoroutine(ReturnToCharacterSelectionScene());
                 }
                 else
                 {
+                    // Log the error that something went wrong while saving
                     Debug.LogError("Failed to save character: " + task.Exception);
                     errorMessageText.text = "Failed to save character.";
                 }
@@ -161,7 +176,9 @@ public class CharacterSaveManager : MonoBehaviour
 
     private IEnumerator ReturnToCharacterSelectionScene()
     {
+        // Wait for 1 second before changing scenes (gives time for UI message or animation)
         yield return new WaitForSeconds(1f);
+        // Load the character selection scene
         SceneManager.LoadScene("Scene_CharacterSelection");
     }
 }

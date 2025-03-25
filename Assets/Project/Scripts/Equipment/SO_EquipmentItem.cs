@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "NewEquipmentData", menuName = "Equipment/Equipment Data")]
-public class EquipmentData : ScriptableObject
+public class SO_EquipmentData : ScriptableObject
 {
     [System.Serializable]
     public class EquipmentItem
@@ -13,7 +13,6 @@ public class EquipmentData : ScriptableObject
             pants,
             head,
             hair,
-            weapon
         }
 
         public ItemType itemType;           // The type of the item (body, torso, pants)

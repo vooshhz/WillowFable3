@@ -4,11 +4,11 @@ public class EquipmentSelector : MonoBehaviour
 {
     public CharacterAnimator characterAnimator;
 
-    public EquipmentData bodyData;
-    public EquipmentData headData;
-    public EquipmentData hairData;
-    public EquipmentData torsoData;
-    public EquipmentData legsData;
+    public SO_EquipmentData bodyData;
+    public SO_EquipmentData headData;
+    public SO_EquipmentData hairData;
+    public SO_EquipmentData torsoData;
+    public SO_EquipmentData legsData;
 
     public void NextBody() => ChangeEquipment("body", false);
     public void PreviousBody() => ChangeEquipment("body", true);
@@ -59,7 +59,7 @@ public class EquipmentSelector : MonoBehaviour
         characterAnimator.RefreshCurrentFrame(); ; // Refresh display
     }
 
-    private int GetNextItemNumber(EquipmentData data, int currentItemNumber)
+    private int GetNextItemNumber(SO_EquipmentData data, int currentItemNumber)
     {
         for (int i = 0; i < data.equipmentItems.Length; i++)
         {
@@ -72,7 +72,7 @@ public class EquipmentSelector : MonoBehaviour
         return currentItemNumber;
     }
 
-    private int GetPreviousItemNumber(EquipmentData data, int currentItemNumber)
+    private int GetPreviousItemNumber(SO_EquipmentData data, int currentItemNumber)
     {
         for (int i = 0; i < data.equipmentItems.Length; i++)
         {

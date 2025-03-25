@@ -12,11 +12,11 @@ public class CharacterAnimator : MonoBehaviour
 
 
     // Equipment data for different parts
-    public EquipmentData headData;
-    public EquipmentData bodyData;
-    public EquipmentData hairData;
-    public EquipmentData torsoData;
-    public EquipmentData legsData;
+    public SO_EquipmentData headData;
+    public SO_EquipmentData bodyData;
+    public SO_EquipmentData hairData;
+    public SO_EquipmentData torsoData;
+    public SO_EquipmentData legsData;
 
     // Currently equipped item numbers (used to identify the correct sprite set)
     public int headItemNumber = 20001;
@@ -141,44 +141,55 @@ public class CharacterAnimator : MonoBehaviour
         // Prevent restarting the same animation
         if (currentAnimation == animationName) return;
 
+        // Store the new animation name as the current one
         currentAnimation = animationName;
-
+        
+        // Try to get the frame range for this animation from the dictionary
         if (!animationFrames.TryGetValue(animationName, out var frames))
         {
+            // If animation name not found, log an error and exit
             Debug.LogError($"Animation '{animationName}' not found.");
             return;
         }
 
-        currentFrame = frames.startFrame;
-        frameTimer = 0f;
-        loopAnimation = looping;
-        currentAnimationStart = frames.startFrame;
-        currentAnimationEnd = frames.endFrame;
+        currentFrame = frames.startFrame;       // Set the starting frame for the animation
+        frameTimer = 0f;    // Reset the frame timer so it starts fresh for this animation
+        loopAnimation = looping;     // Store whether the animation should loop or not
+        currentAnimationStart = frames.startFrame;     // Store the start frames for the animation
+        currentAnimationEnd = frames.endFrame;    // Store the end frames for the animation
 
         SetFrame(currentFrame); // Show the first frame immediately
     }
 
     private void UpdateAnimation()
     {
+        // Add the time passed since the last frame to the frame timer
+        // This helps control the speed of animation playback
         frameTimer += Time.deltaTime;
 
+        // Check if enough time has passed to move to the next frame
         if (frameTimer >= frameRate)
         {
+            // Subtract the frameRate from the timer to account for frame advance
+            // (This keeps leftover time so it's still accurate over time)
             frameTimer -= frameRate;
-            currentFrame++;
+            currentFrame++; // Advance to the next frame in the animation sequence
 
+            // If the current frame has gone past the last frame in the animation
             if (currentFrame > currentAnimationEnd)
             {
+                // If this animation should loop, reset to the first frame
                 if (loopAnimation)
                 {
                     currentFrame = currentAnimationStart;
                 }
+                // Otherwise, stop at the last frame and don't advance further
                 else
                 {
                     currentFrame = currentAnimationEnd;
                 }
             }
-
+            // Apply the new frame by updating the sprite renderers
             SetFrame(currentFrame);
         }
     }
@@ -186,45 +197,58 @@ public class CharacterAnimator : MonoBehaviour
     /// Sets the correct frame for each body part.
     public void SetFrame(int frameIndex)
     {
+        // Update the current frame tracker to the given frame index
         currentFrame = frameIndex;
 
+        // For each body part, if its SpriteRenderer and SO_EquipmentData are assigned,
+        // fetch the correct sprite from the equipment data and set it to the renderer
+
         if (headRenderer != null && headData != null)
-            headRenderer.sprite = GetSpriteFromItem(headData, headItemNumber, frameIndex);
+            headRenderer.sprite = GetSpriteFromItem(headData, headItemNumber, frameIndex); // Set head sprite
 
         if (bodyRenderer != null && bodyData != null)
-            bodyRenderer.sprite = GetSpriteFromItem(bodyData, bodyItemNumber, frameIndex);
+            bodyRenderer.sprite = GetSpriteFromItem(bodyData, bodyItemNumber, frameIndex); // Set body sprite
 
         if (hairRenderer != null && hairData != null)
-            hairRenderer.sprite = GetSpriteFromItem(hairData, hairItemNumber, frameIndex);
+            hairRenderer.sprite = GetSpriteFromItem(hairData, hairItemNumber, frameIndex); // Set hair sprite
 
         if (torsoRenderer != null && torsoData != null)
-            torsoRenderer.sprite = GetSpriteFromItem(torsoData, torsoItemNumber, frameIndex);
+            torsoRenderer.sprite = GetSpriteFromItem(torsoData, torsoItemNumber, frameIndex); // Set torso sprite
 
         if (legsRenderer != null && legsData != null)
-            legsRenderer.sprite = GetSpriteFromItem(legsData, legsItemNumber, frameIndex);
+            legsRenderer.sprite = GetSpriteFromItem(legsData, legsItemNumber, frameIndex);  // Set legs sprite
     }
 
     /// Fetches the correct sprite for an equipment item.
-    private Sprite GetSpriteFromItem(EquipmentData data, int itemNumber, int frameIndex)
+    private Sprite GetSpriteFromItem(SO_EquipmentData data, int itemNumber, int frameIndex)
     {
+        // Loop through all equipment items in the given data (e.g., all head items)
         foreach (var item in data.equipmentItems)
         {
+            // Check if this item matches the requested item number (equipped item)
             if (item.itemNumber == itemNumber)
             {
+                // Check if the requested frame index is within the bounds of the sprite array
                 if (frameIndex >= 0 && frameIndex < item.slicedSpritesArray.Length)
+                    // Return the sprite corresponding to the frame index
                     return item.slicedSpritesArray[frameIndex];
                 else
+                    // Log a warning if the frame index is invalid for this item
                     Debug.LogWarning($"Frame index {frameIndex} is out of range for item {item.itemName}");
             }
         }
-
+        // If no item matched the item number, log a warning
         Debug.LogWarning($"Item number {itemNumber} not found in {data.name}");
+            
+        // Return null to indicate failure to find the sprite
         return null;
     }
 
     /// Refreshes the character's current animation frame.
     public void RefreshCurrentFrame()
     {
+        // Re-applies the current frame by calling SetFrame()
+        // Useful when equipment or sprite data changes but the animation/frame stays the same
         SetFrame(currentFrame);
     }
 }
