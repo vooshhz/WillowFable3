@@ -9,8 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 18507b3c59e90a2459f0f554892e7d30, type: 3}
-  m_Name: hair
+  m_Script: {fileID: 11500000, guid: b68f0e7ee9ae54640aafee1da5bb1374, type: 3}
+  m_Name: SO_EquipmentData_hair
   m_EditorClassIdentifier: 
   equipmentItems:
   - itemType: 4
@@ -617,7 +617,7 @@ MonoBehaviour:
     - {fileID: 183681453, guid: 186bcdbcb7453fe439046fa567524155, type: 3}
   - itemType: 4
     itemNumber: 30002
-    itemName: hair_darkbrown
+    itemName: hair_dark_brown
     slicedSpritesArray:
     - {fileID: 1950512708, guid: 5440e6b392d965242b1d025ef94f5f0d, type: 3}
     - {fileID: -1391387372, guid: 5440e6b392d965242b1d025ef94f5f0d, type: 3}

@@ -9,13 +9,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 18507b3c59e90a2459f0f554892e7d30, type: 3}
-  m_Name: legs
+  m_Script: {fileID: 11500000, guid: b68f0e7ee9ae54640aafee1da5bb1374, type: 3}
+  m_Name: SO_EquipmentData_legs
   m_EditorClassIdentifier: 
   equipmentItems:
   - itemType: 2
     itemNumber: 50001
-    itemName: legs_charcoal
+    itemName: pants_charcoal
     slicedSpritesArray:
     - {fileID: -1143089024, guid: f175cf1a6dd0b354e9161a0322ccb6b4, type: 3}
     - {fileID: -481579503, guid: f175cf1a6dd0b354e9161a0322ccb6b4, type: 3}
@@ -617,7 +617,7 @@ MonoBehaviour:
     - {fileID: 151204984, guid: f175cf1a6dd0b354e9161a0322ccb6b4, type: 3}
   - itemType: 2
     itemNumber: 50002
-    itemName: legs_sky
+    itemName: pants_sky
     slicedSpritesArray:
     - {fileID: 1413417257, guid: ddad35e39ad5eab45a555fa3f482238e, type: 3}
     - {fileID: -1096356923, guid: ddad35e39ad5eab45a555fa3f482238e, type: 3}

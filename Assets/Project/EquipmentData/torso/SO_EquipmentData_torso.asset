@@ -9,13 +9,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 18507b3c59e90a2459f0f554892e7d30, type: 3}
-  m_Name: torso
+  m_Script: {fileID: 11500000, guid: b68f0e7ee9ae54640aafee1da5bb1374, type: 3}
+  m_Name: SO_EquipmentData_torso
   m_EditorClassIdentifier: 
   equipmentItems:
-  - itemType: 0
+  - itemType: 1
     itemNumber: 40001
-    itemName: torso_armour_gold
+    itemName: torso_gold
     slicedSpritesArray:
     - {fileID: 769423745, guid: 1e17f554ea1487f4d91f5e3471205f40, type: 3}
     - {fileID: -501814973, guid: 1e17f554ea1487f4d91f5e3471205f40, type: 3}
@@ -615,9 +615,9 @@ MonoBehaviour:
     - {fileID: 1564711897, guid: 1e17f554ea1487f4d91f5e3471205f40, type: 3}
     - {fileID: 319260113, guid: 1e17f554ea1487f4d91f5e3471205f40, type: 3}
     - {fileID: -149684933, guid: 1e17f554ea1487f4d91f5e3471205f40, type: 3}
-  - itemType: 0
+  - itemType: 1
     itemNumber: 40002
-    itemName: torso_armour_iron
+    itemName: torso_iron
     slicedSpritesArray:
     - {fileID: -1535030547, guid: 227347c33da72d94d92a5b46eedf79cb, type: 3}
     - {fileID: 1628931597, guid: 227347c33da72d94d92a5b46eedf79cb, type: 3}

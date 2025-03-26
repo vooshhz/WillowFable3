@@ -10003,20 +10003,6 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
---- !u!114 &317187567627621249
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8986675767552796878}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7614818d55709f146b19c04102bf630f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  sceneNameGoto: 1
-  scenePositionGoto: {x: -2, y: -11, z: 0}
 --- !u!483693784 &490993507551647253
 TilemapRenderer:
   m_ObjectHideFlags: 0
@@ -63338,7 +63324,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5319483665748653757}
-  - component: {fileID: 317187567627621249}
   - component: {fileID: 6271693616794844397}
   - component: {fileID: 2862064367253726207}
   m_Layer: 0
