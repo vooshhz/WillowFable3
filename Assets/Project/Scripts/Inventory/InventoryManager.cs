@@ -9,6 +9,7 @@ using Unity.VisualScripting;
 
 public class InventoryManager : MonoBehaviour // Need to check this part and figure out singleton without inherting
 {
+    public static bool IsInventorManagerReady {get; private set;} 
     public UIInventoryBar inventoryBar;
     public static InventoryManager Instance { get; private set; }
     private Dictionary<int, ItemDetails> itemDetailsDictionary;
@@ -39,9 +40,8 @@ public class InventoryManager : MonoBehaviour // Need to check this part and fig
     private void Start() 
     {
         dbReference = FirebaseDatabase.GetInstance("https://willowfable3-default-rtdb.firebaseio.com/").RootReference;
-        
-        // Load inventory when game starts
-        LoadInventoryFromFirebase();
+        // Load inventory when Persistent Scene has finished loading
+        EventManager.Instance.Subscribe(EventType.PersistentSceneLoaded, LoadInventoryFromFirebase);        
     }
     private void CreateInventoryLists()
     {
@@ -103,7 +103,6 @@ public class InventoryManager : MonoBehaviour // Need to check this part and fig
         LoadInventoryFromFirebase();
     }
 }
-
     private void RemoveItemAtPosition(List<InventoryItem> inventoryList, int itemCode, int position)
 {
     InventoryItem inventoryItem = new InventoryItem();
@@ -135,7 +134,6 @@ public class InventoryManager : MonoBehaviour // Need to check this part and fig
         
         return -1;
     }
-
     private void AddItemAtPosition(List<InventoryItem> inventoryList, int itemCode)
     {
         InventoryItem inventoryItem = new InventoryItem();
@@ -144,7 +142,6 @@ public class InventoryManager : MonoBehaviour // Need to check this part and fig
         inventoryItem.itemQuantity = 1;
         inventoryList.Add(inventoryItem);
     }
-
     private void AddItemAtPosition(List<InventoryItem> inventoryList, int itemCode, int position)
 {
     // Get existing item
@@ -362,8 +359,8 @@ public class InventoryManager : MonoBehaviour // Need to check this part and fig
                             InventoryData inventoryData = JsonUtility.FromJson<InventoryData>(json);
                             
                             // Replace the current inventory with the loaded one
-                            inventoryLists[(int)InventoryLocation.player] = inventoryData.items;
-                            
+                            inventoryLists[(int)InventoryLocation.player] = inventoryData.items;                            
+
                             // Update UI
                             if (inventoryBar != null)
                             {
@@ -373,7 +370,10 @@ public class InventoryManager : MonoBehaviour // Need to check this part and fig
                             {
                                 Debug.LogWarning("Inventory bar is not initialized yet.");
                             }
-                            
+                                                    // ✅ Inventory was successfully loaded and UI updated
+                            IsInventorManagerReady = true;
+                            // Trigger event so other systems know we're good to go
+                            EventManager.Instance.TriggerEvent(EventType.InventoryInitialized);
                             Debug.Log("Inventory loaded successfully!");
                         }
                         catch (System.Exception e)
@@ -386,6 +386,8 @@ public class InventoryManager : MonoBehaviour // Need to check this part and fig
                         Debug.Log("No inventory data found. Starting with empty inventory.");
                     }
                 }
+                // Clean up subscription so it doesn't fire again
+                EventManager.Instance.Unsubscribe(EventType.PersistentSceneLoaded, LoadInventoryFromFirebase);
             });
     }
 

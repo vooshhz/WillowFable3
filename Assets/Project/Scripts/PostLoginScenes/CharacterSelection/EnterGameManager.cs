@@ -44,11 +44,6 @@ public class EnterGameManager : MonoBehaviour
         PlayerPrefs.SetString("SelectedCharacterId", selectedCharacterId);
         PlayerPrefs.Save(); // Ensure data is written to disk
 
-        // If the persistent scene is not already loaded, load it now
-        if (!SceneManager.GetSceneByName(persistentScene).isLoaded)
-        {
-            Debug.Log("PersistentScene is not loaded. Loading it now...");
-            SceneManager.LoadScene(persistentScene); // Load the main game scene
-        }
+        SceneLoader.Instance.LoadScene("PersistentScene", EventType.PersistentSceneLoaded);
     }
 }

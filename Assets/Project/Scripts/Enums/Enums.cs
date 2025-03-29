@@ -52,3 +52,32 @@ public enum SceneName
     Scene_Field_Scene
 }
 
+public enum EventType
+{
+    // Login and authentication events
+    LoginSuccessful,
+    LoginFailed,
+    CharacterDataLoaded,
+    CharacterSelected,
+    
+    // Scene loading events
+    PersistentSceneLoaded,
+    PlayerSceneLoaded,
+    UISceneLoaded,
+    AllScenesLoaded,
+    
+    // Game system initialization events
+    NetworkManagerReady,
+    InventoryInitialized,
+    PlayerInstantiated,
+    PlayerUIConnected,
+    
+    // Player-related events
+    PlayerPositionUpdated,
+    PlayerEquipmentChanged,
+    InventoryUpdated,
+    
+    // Scene transition events
+    BeginSceneTransition,
+    SceneTransitionComplete
+}
