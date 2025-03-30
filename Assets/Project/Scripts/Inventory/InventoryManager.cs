@@ -1,11 +1,8 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using Firebase.Database;
 using Firebase.Auth;
 using Firebase.Extensions;
-using Unity.VisualScripting;
 
 public class InventoryManager : MonoBehaviour // Need to check this part and figure out singleton without inherting
 {
@@ -41,7 +38,7 @@ public class InventoryManager : MonoBehaviour // Need to check this part and fig
     {
         dbReference = FirebaseDatabase.GetInstance("https://willowfable3-default-rtdb.firebaseio.com/").RootReference;
         // Load inventory when Persistent Scene has finished loading
-        EventManager.Instance.Subscribe(EventType.PersistentSceneLoaded, LoadInventoryFromFirebase);        
+        EventManager.Instance.Subscribe(EventType.FirebaseCharacterSynced, LoadInventoryFromFirebase);        
     }
     private void CreateInventoryLists()
     {
@@ -264,7 +261,7 @@ public class InventoryManager : MonoBehaviour // Need to check this part and fig
     }
 
     public void InitializeInventoryBar()
-{
+    {
     // Find the InitializeUI script in the scene
     InitializeUI initializeUI = FindObjectOfType<InitializeUI>();
 
@@ -387,7 +384,7 @@ public class InventoryManager : MonoBehaviour // Need to check this part and fig
                     }
                 }
                 // Clean up subscription so it doesn't fire again
-                EventManager.Instance.Unsubscribe(EventType.PersistentSceneLoaded, LoadInventoryFromFirebase);
+                EventManager.Instance.Unsubscribe(EventType.FirebaseCharacterSynced, LoadInventoryFromFirebase);
             });
     }
 

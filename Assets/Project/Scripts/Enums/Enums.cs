@@ -63,18 +63,20 @@ public enum EventType
     // Scene loading events
     PersistentSceneLoaded,
     PlayerSceneLoaded,
-    UISceneLoaded,
+    PlayerUISceneLoaded,
     AllScenesLoaded,
     
     // Game system initialization events
+    CustomNetworkPlayerPrefabSpawnned,
     NetworkManagerReady,
+    FirebaseCharacterSynced,
     InventoryInitialized,
     PlayerInstantiated,
     PlayerUIConnected,
     
     // Player-related events
     PlayerPositionUpdated,
-    PlayerEquipmentChanged,
+    PlayerEquipmentApplied,
     InventoryUpdated,
     
     // Scene transition events

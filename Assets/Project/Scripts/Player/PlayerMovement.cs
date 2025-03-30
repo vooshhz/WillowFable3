@@ -74,7 +74,7 @@ public class PlayerMovement : NetworkBehaviour
         CharacterState newState = (moveInput != Vector2.zero) ? CharacterState.Running : CharacterState.Idle;
 
         // Send state update to the network if it has changed
-        if (newState != networkCharacter.currentState || playerFacing != networkCharacter.currentDirection)
+        if (newState != networkCharacter.CurrentState || playerFacing != networkCharacter.CurrentDirection)
         {
             networkCharacter.CmdUpdateState(newState, playerFacing);
         }
